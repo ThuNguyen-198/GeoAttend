@@ -1,9 +1,10 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomePage from "./HomePage";
-import Attendance from "./Attendance";
-import Groups from "./Groups";
-import Messages from "./Messages";
+import HomePage from "../Components/HomePage";
+import Attendance from "../Components/Attendance";
+import Groups from "../Components/Groups";
+import Messages from "../Components/Messages";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import CourseNavigator from "./CourseNavigator";
 
 export default function TabNavigator() {
   const Tab = createBottomTabNavigator();
@@ -15,7 +16,7 @@ export default function TabNavigator() {
     >
       <Tab.Screen
         name="Home"
-        component={HomePage}
+        component={CourseNavigator}
         options={{
           tabBarIcon: ({ size, color }) => (
             <MaterialCommunityIcons
