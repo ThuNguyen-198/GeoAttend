@@ -2,13 +2,15 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 import TabNavigator from "./navigation/TabNavigator";
 import { NavigationContainer } from "@react-navigation/native";
+import AuthNavigator from "./navigation/AuthNavigator";
 
 export default function App() {
   console.log("hello");
 
   return (
     <NavigationContainer>
-      <TabNavigator />
+      <AuthNavigator />
+      {/* <TabNavigator /> */}
     </NavigationContainer>
   );
 }
