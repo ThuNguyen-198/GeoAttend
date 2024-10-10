@@ -14,31 +14,9 @@ export default function HomePage({ navigation }) {
     { courseName: "Advanced Algorithm" },
   ];
 
-  const listStyle = StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingTop: 22,
-      paddingHorizontal: 10,
-    },
-    card: {
-      backgroundColor: "#fff",
-      padding: 15,
-      marginVertical: 10,
-      borderRadius: 8,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 3,
-      elevation: 5,
-    },
-    item: {
-      fontSize: 18,
-      color: "#013976",
-    },
-  });
-
   return (
     <View style={listStyle.container}>
+      <Text style={listStyle.title}>Courses</Text>
       <FlatList
         data={courses}
         renderItem={({ item }) => (
@@ -54,3 +32,32 @@ export default function HomePage({ navigation }) {
     </View>
   );
 }
+const listStyle = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 22,
+    paddingHorizontal: 14,
+  },
+  title: {
+    fontSize: 24,
+    color: "#000",
+    fontWeight: "bold",
+  },
+  card: {
+    backgroundColor: "#fff",
+    padding: 20,
+    marginVertical: 10,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 1,
+    elevation: 5,
+    borderWidth: 0.3,
+    borderColor: "#A4A4A4",
+  },
+  item: {
+    fontSize: 18,
+    color: "#013976",
+  },
+});
