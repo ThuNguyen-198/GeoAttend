@@ -22,7 +22,10 @@ export default function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: "#013976",
+        headerShown: true,
+        headerTitle: () => <CustomHeader />,
+        headerStyle: { backgroundColor: "#013976" },
+        headerTitleAlign: "left",
       }}
     >
       <Tab.Screen
@@ -36,10 +39,6 @@ export default function TabNavigator() {
               color={color}
             />
           ),
-          headerShown: true,
-          headerTitle: () => <CustomHeader />,
-          headerStyle: { backgroundColor: "#003366" },
-          headerTitleAlign: "left",
         }}
       />
       <Tab.Screen
@@ -92,12 +91,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: "#003366", // Header background color
   },
   headerText: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#EFAB00", // Header text color
+    color: "#EFAB00",
   },
   addButton: {
     borderRadius: 50,
@@ -109,6 +107,6 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     fontSize: 24,
-    color: "white", // Add button text color
+    color: "white",
   },
 });
