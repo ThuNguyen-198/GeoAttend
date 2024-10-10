@@ -9,18 +9,16 @@ import {
   Keyboard,
   TouchableOpacity,
 } from "react-native";
+import { useAuth } from "../context/AuthContext";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useAuth();
 
   const isFormValid = email && password;
   const handleLogin = () => {
-    if (isFormValid) {
-      Alert.alert("Login Successful", `Welcome, ${email}`);
-    } else {
-      Alert.alert("Error", "Please enter both email and password");
-    }
+    Alert.alert("Error", "Please enter both email and password");
   };
 
   const handleMicrosoftLogin = () => {
@@ -54,7 +52,7 @@ const LoginScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={[styles.button, isFormValid ? null : styles.buttonDisabled]}
-          onPress={handleLogin}
+          onPress={login}
           disabled={!isFormValid}
         >
           <Text style={styles.buttonText}>Log in</Text>

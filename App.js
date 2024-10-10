@@ -3,15 +3,14 @@ import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 import TabNavigator from "./navigation/TabNavigator";
 import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigator from "./navigation/AuthNavigator";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import AppNavigator from "./navigation/AppNavigator";
 
 export default function App() {
-  console.log("hello");
-
   return (
-    <NavigationContainer>
-      <AuthNavigator />
-      {/* <TabNavigator /> */}
-    </NavigationContainer>
+    <AuthProvider>
+      <AppNavigator />
+    </AuthProvider>
   );
 }
 
