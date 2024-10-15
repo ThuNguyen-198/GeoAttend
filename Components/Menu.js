@@ -1,8 +1,11 @@
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { View, Image, Button, Text, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuth } from "../context/AuthContext";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function Menu() {
+  const { logout } = useAuth();
   return (
     <DrawerContentScrollView style={styles.container}>
       <View style={styles.row}>
@@ -23,10 +26,10 @@ export default function Menu() {
         <MaterialCommunityIcons style={styles.menuIcon} name="cog-outline" />
         <Text style={styles.menuItemText}>Setting</Text>
       </View>
-      <View style={styles.row}>
+      <TouchableOpacity style={styles.row} onPress={logout}>
         <MaterialCommunityIcons style={styles.menuIcon} name="logout" />
         <Text style={styles.menuItemText}>Log out</Text>
-      </View>
+      </TouchableOpacity>
     </DrawerContentScrollView>
   );
 }
