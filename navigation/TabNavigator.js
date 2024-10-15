@@ -6,15 +6,21 @@ import Messages from "../Components/Messages";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CourseNavigator from "./CourseNavigator";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 export default function TabNavigator() {
   const Tab = createBottomTabNavigator();
-
-  // Custom header component
-  const CustomHeader = () => {
+  const navigation = useNavigation();
+  const AppHeader = () => {
     return (
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>GeoAttend</Text>
+        <MaterialCommunityIcons
+          name="menu"
+          size={30}
+          color="white"
+          onPress={() => navigation.openDrawer()}
+        />
       </View>
     );
   };
@@ -23,9 +29,9 @@ export default function TabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: true,
-        headerTitle: () => <CustomHeader />,
+        headerTitle: () => <AppHeader />,
         headerStyle: { backgroundColor: "#013976" },
-        headerTitleAlign: "left",
+        headerTitleAlign: "space-between",
       }}
     >
       <Tab.Screen
@@ -86,10 +92,10 @@ export default function TabNavigator() {
 
 const styles = StyleSheet.create({
   headerContainer: {
+    width: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
     paddingVertical: 8,
   },
   headerText: {

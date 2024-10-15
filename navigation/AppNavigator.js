@@ -4,13 +4,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import { useAuth } from "../context/AuthContext";
 import TabNavigator from "./TabNavigator";
 import AuthNavigator from "./AuthNavigator";
+import MenuDrawerNavigator from "./MenuDrawerNavigator";
 
 const AppNavigator = () => {
   const { isAuthenticated } = useAuth();
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <TabNavigator /> : <AuthNavigator />}
+      {isAuthenticated ? <MenuDrawerNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 };
