@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 export default function HomePage({ navigation }) {
   const courses = [
     { courseName: "Advanced Database" },
@@ -15,16 +15,20 @@ export default function HomePage({ navigation }) {
   ];
 
   return (
-    <View style={listStyle.container}>
-      <Text style={listStyle.title}>Courses</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Courses</Text>
+        <MaterialCommunityIcons name="plus" size={38} color="#949494" />
+      </View>
+
       <FlatList
         data={courses}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => navigation.navigate("CourseDetails")}
-            style={listStyle.card}
+            style={styles.card}
           >
-            <Text style={listStyle.item}>{item.courseName}</Text>
+            <Text style={styles.item}>{item.courseName}</Text>
           </TouchableOpacity>
         )}
         keyExtractor={(item, index) => index.toString()}
@@ -32,11 +36,17 @@ export default function HomePage({ navigation }) {
     </View>
   );
 }
-const listStyle = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 22,
     paddingHorizontal: 14,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 10,
   },
   title: {
     fontSize: 24,

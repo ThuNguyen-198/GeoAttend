@@ -5,6 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigator from "./navigation/AuthNavigator";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import AppNavigator from "./navigation/AppNavigator";
+import "./gesture-handler";
 
 export default function App() {
   return (
