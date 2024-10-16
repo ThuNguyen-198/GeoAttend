@@ -6,11 +6,14 @@ import AuthNavigator from "./navigation/AuthNavigator";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import AppNavigator from "./navigation/AppNavigator";
 import "./gesture-handler";
+import { LocationProvider } from "./context/LocationContext";
 
 export default function App() {
   return (
     <AuthProvider>
-      <AppNavigator />
+      <LocationProvider>
+        <AppNavigator />
+      </LocationProvider>
     </AuthProvider>
   );
 }

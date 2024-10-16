@@ -7,21 +7,26 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Switch,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useRoute } from "@react-navigation/native";
+import { useLocation } from "../context/LocationContext";
 
 export default function CourseDetails() {
   const [markAttendanceIsOpen, setMarkAttendanceIsOpen] = useState(false);
   const [attendanceRecordIsOpen, setAttendanceRecordIsOpen] = useState(false);
   const [groupIsOpen, setGroupIsOpen] = useState(false);
-  const [locationIsOn, setLocationIsOn] = useState(false);
+  // const [locationIsOn, setLocationIsOn] = useState(false);
   const [location, setLocation] = useState("Kent State University");
   const [code, setCode] = useState("");
+  const { locationIsOn, turnOnLocation, turnOffLocation } = useLocation();
   const route = useRoute();
   const course = route.params;
-  console.log(course);
+  const handleLocation = () => {
+    locationIsOn ? turnOffLocation() : turnOnLocation();
+  };
   const onSubmitAttendance = () => {
     setCode("");
     Alert.alert("Attendance submitted!");
@@ -45,21 +50,29 @@ export default function CourseDetails() {
       {/* ----------------------------------------------------------- */}
       {markAttendanceIsOpen && (
         <View style={styles.markAttendanceContainer}>
-          <View style={[styles.row, styles.paddingBottom]}>
-            <MaterialCommunityIcons
-              name="map-marker-outline"
-              style={styles.itemIcon}
-            />
-            <Text style={styles.text}>
-              {locationIsOn ? (
-                location
-              ) : (
-                <Text onPress={() => setLocationIsOn(!locationIsOn)}>
-                  Turn on my location
-                </Text>
-              )}
-            </Text>
+          <View style={[styles.row, { width: "100%" }]}>
+            <View style={styles.row}>
+              <MaterialCommunityIcons
+                name={
+                  locationIsOn
+                    ? "map-marker-check-outline"
+                    : "map-marker-off-outline"
+                }
+                style={styles.itemIcon}
+              />
+              <Text style={styles.text}>
+                {locationIsOn ? (
+                  location
+                ) : (
+                  <Text onPress={handleLocation}>
+                    Please turn on your location
+                  </Text>
+                )}
+              </Text>
+            </View>
+            <Switch value={locationIsOn} onValueChange={handleLocation} />
           </View>
+
           <TextInput
             style={styles.input}
             placeholder="Enter the code..."
@@ -129,10 +142,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   markAttendanceContainer: {
+    flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "flex-start",
     paddingHorizontal: 20,
     paddingVertical: 12,
+    gap: 22,
   },
   header: {
     flexDirection: "row",
@@ -188,9 +203,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     color: "#424242",
-  },
-  paddingBottom: {
-    paddingBottom: 16,
   },
   buttonCenter: {
     flexDirection: "row",
