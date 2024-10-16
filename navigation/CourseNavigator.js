@@ -11,7 +11,11 @@ export default function CourseNavigator() {
         component={HomePage}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="CourseDetails" component={CourseDetails} />
+      <Stack.Screen
+        name="CourseDetails"
+        component={CourseDetails}
+        options={({ route }) => ({ title: route.params.item.courseName })}
+      />
     </Stack.Navigator>
   );
 }

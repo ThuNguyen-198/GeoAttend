@@ -5,22 +5,33 @@ import Groups from "../Components/Groups";
 import Messages from "../Components/Messages";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CourseNavigator from "./CourseNavigator";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 export default function TabNavigator() {
   const Tab = createBottomTabNavigator();
   const navigation = useNavigation();
+  const handleLocation = () => {
+    Alert.alert("handle location here!");
+  };
   const AppHeader = () => {
     return (
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>GeoAttend</Text>
-        <MaterialCommunityIcons
-          name="menu"
-          size={30}
-          color="white"
-          onPress={() => navigation.openDrawer()}
-        />
+        <View style={styles.pair}>
+          <MaterialCommunityIcons
+            name="map-marker-outline"
+            size={30}
+            color="white"
+            onPress={handleLocation}
+          />
+          <MaterialCommunityIcons
+            name="menu"
+            size={30}
+            color="white"
+            onPress={() => navigation.openDrawer()}
+          />
+        </View>
       </View>
     );
   };
@@ -114,5 +125,10 @@ const styles = StyleSheet.create({
   addButtonText: {
     fontSize: 24,
     color: "white",
+  },
+  pair: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
 });

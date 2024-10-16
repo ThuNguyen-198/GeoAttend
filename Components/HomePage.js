@@ -9,9 +9,9 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 export default function HomePage({ navigation }) {
   const courses = [
-    { courseName: "Advanced Database" },
-    { courseName: "Capstone Project" },
-    { courseName: "Advanced Algorithm" },
+    { courseId: "112", courseName: "Advanced Database" },
+    { courseId: "136", courseName: "Capstone Project" },
+    { courseId: "143", courseName: "Advanced Algorithm" },
   ];
 
   return (
@@ -25,7 +25,7 @@ export default function HomePage({ navigation }) {
         data={courses}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate("CourseDetails")}
+            onPress={() => navigation.navigate("CourseDetails", { item })}
             style={styles.card}
           >
             <Text style={styles.item}>{item.courseName}</Text>
