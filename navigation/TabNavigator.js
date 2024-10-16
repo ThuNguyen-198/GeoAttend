@@ -7,6 +7,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CourseNavigator from "./CourseNavigator";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import MarkAttendanceScreen from "../Components/MarkAttendanceScreen";
+import MarkAttendanceButton from "./MarkAttendanceButton";
 
 export default function TabNavigator() {
   const Tab = createBottomTabNavigator();
@@ -65,6 +67,20 @@ export default function TabNavigator() {
           tabBarIcon: ({ size, color }) => (
             <MaterialCommunityIcons
               name="check-outline"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Mark Attendance"
+        component={MarkAttendanceScreen}
+        options={{
+          tabBarButton: () => <MarkAttendanceButton />,
+          tabBarIcon: ({ size, color }) => (
+            <MaterialCommunityIcons
+              name="plus-circle"
               size={size}
               color={color}
             />
