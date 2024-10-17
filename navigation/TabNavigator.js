@@ -8,9 +8,13 @@ import CourseNavigator from "./CourseNavigator";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+import MarkAttendanceButton from "./MarkAttendanceButton";
+import { useLocation } from "../context/LocationContext";
+
 export default function TabNavigator() {
   const Tab = createBottomTabNavigator();
   const navigation = useNavigation();
+  const { locationIsOn } = useLocation();
   const handleLocation = () => {
     Alert.alert("handle location here!");
   };
@@ -20,7 +24,11 @@ export default function TabNavigator() {
         <Text style={styles.headerText}>GeoAttend</Text>
         <View style={styles.pair}>
           <MaterialCommunityIcons
-            name="map-marker-outline"
+            name={
+              locationIsOn
+                ? "map-marker-check-outline"
+                : "map-marker-off-outline"
+            }
             size={30}
             color="white"
             onPress={handleLocation}
@@ -68,6 +76,15 @@ export default function TabNavigator() {
               size={size}
               color={color}
             />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="MarkAttendance"
+        component={HomePage}
+        options={{
+          tabBarButton: (props) => (
+            <MarkAttendanceButton {...props}></MarkAttendanceButton>
           ),
         }}
       />
@@ -129,6 +146,6 @@ const styles = StyleSheet.create({
   pair: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 16,
   },
 });
