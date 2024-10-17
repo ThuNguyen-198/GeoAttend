@@ -10,20 +10,26 @@ import {
   Switch,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import { useLocation } from "../context/LocationContext";
+import MarkAttendanceModal from "./MarkAttendanceModal";
 
 export default function CourseDetails() {
   const [markAttendanceIsOpen, setMarkAttendanceIsOpen] = useState(false);
   const [attendanceRecordIsOpen, setAttendanceRecordIsOpen] = useState(false);
   const [groupIsOpen, setGroupIsOpen] = useState(false);
-  // const [locationIsOn, setLocationIsOn] = useState(false);
   const [location, setLocation] = useState("Kent State University");
   const [code, setCode] = useState("");
   const { locationIsOn, turnOnLocation, turnOffLocation } = useLocation();
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [course, setCourse] = useState({});
   const route = useRoute();
-  const course = route.params;
+  const { item } = route.params;
+  useEffect(() => {
+    setCourse(item);
+  }, []);
+
   const handleLocation = () => {
     locationIsOn ? turnOffLocation() : turnOnLocation();
   };
@@ -34,75 +40,14 @@ export default function CourseDetails() {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.card, styles.row]}
-        onPress={() => setMarkAttendanceIsOpen(!markAttendanceIsOpen)}
+        style={[styles.card, styles.row, styles.borderLine]}
+        onPress={() => setModalVisible(true)}
       >
         <View style={styles.row}>
           <MaterialCommunityIcons name="plus" style={styles.itemIcon} />
           <Text style={styles.cardName}>Mark Attendance</Text>
         </View>
-
-        <MaterialCommunityIcons
-          name={markAttendanceIsOpen ? "chevron-up" : "chevron-down"}
-          style={styles.dropdownIcon}
-        />
       </TouchableOpacity>
-      {/* ----------------------------------------------------------- */}
-      {markAttendanceIsOpen && (
-        <View style={styles.markAttendanceContainer}>
-          <View style={[styles.row, { width: "100%" }]}>
-            <View style={styles.row}>
-              <MaterialCommunityIcons
-                name={
-                  locationIsOn
-                    ? "map-marker-check-outline"
-                    : "map-marker-off-outline"
-                }
-                style={styles.itemIcon}
-              />
-              <Text style={styles.text}>
-                {locationIsOn ? (
-                  location
-                ) : (
-                  <Text onPress={handleLocation}>
-                    Please turn on your location
-                  </Text>
-                )}
-              </Text>
-            </View>
-            <Switch value={locationIsOn} onValueChange={handleLocation} />
-          </View>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Enter the code..."
-            keyboardType="default"
-            value={code}
-            onChangeText={setCode}
-          />
-          <View style={styles.buttonCenter}>
-            <TouchableOpacity
-              style={
-                locationIsOn && code
-                  ? styles.submitButton
-                  : styles.buttonDisabled
-              }
-              onPress={onSubmitAttendance}
-            >
-              <Text
-                style={
-                  locationIsOn && code
-                    ? styles.submitButtonText
-                    : styles.buttonDisabledText
-                }
-              >
-                Submit
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-      {/* ----------------------------------------------------------- */}
 
       <TouchableOpacity style={[styles.card, styles.row]}>
         <View style={styles.row}>
@@ -132,6 +77,11 @@ export default function CourseDetails() {
           style={styles.dropdownIcon}
         />
       </TouchableOpacity>
+      <MarkAttendanceModal
+        visible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+        course={course}
+      />
     </View>
   );
 }
@@ -173,6 +123,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderColor: "#A4A4A4",
   },
+  shadow: {},
   cardName: {
     fontSize: 18,
     color: "#013976",
@@ -235,5 +186,9 @@ const styles = StyleSheet.create({
     color: "#a4a4a4",
     fontSize: 20,
     textAlign: "center",
+  },
+  borderLine: {
+    borderWidth: 1,
+    borderColor: "#EFAB00",
   },
 });

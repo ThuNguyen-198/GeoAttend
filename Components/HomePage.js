@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 export default function HomePage({ navigation }) {
   const courses = [
     { courseId: "112", courseName: "Advanced Database" },
@@ -57,14 +58,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     marginVertical: 10,
-    borderRadius: 8,
+    borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 1,
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
     elevation: 5,
-    borderWidth: 0.3,
-    borderColor: "#A4A4A4",
+    marginHorizontal: 4,
   },
   item: {
     fontSize: 18,
