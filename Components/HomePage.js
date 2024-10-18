@@ -7,14 +7,17 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { supabase } from "../backend/supabase";
 
+import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 export default function HomePage({ navigation }) {
+const something = supabase .from("course").select('*');
+  console.log(something)
   const courses = [
     { courseId: "112", courseName: "Advanced Database" },
     { courseId: "136", courseName: "Capstone Project" },
     { courseId: "143", courseName: "Advanced Algorithm" },
   ];
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
