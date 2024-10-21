@@ -10,6 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import MarkAttendanceButton from "./MarkAttendanceButton";
 import { useLocation } from "../context/LocationContext";
+import MessageNavigator from "./MessageNavigator";
 
 export default function TabNavigator() {
   const Tab = createBottomTabNavigator();
@@ -103,7 +104,7 @@ export default function TabNavigator() {
       />
       <Tab.Screen
         name="Messages"
-        component={Messages}
+        component={MessageNavigator}
         options={{
           tabBarIcon: ({ size, color }) => (
             <MaterialCommunityIcons
