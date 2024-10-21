@@ -34,7 +34,7 @@ export default function Messages({ navigation }) {
         {
           date: "10/21/2024",
           time: "1:30pm",
-          message: "Hey, how's the design going?",
+          message: "Hey, are you finished with the assignment for tomorrow?",
           seen: true,
         },
       ],
