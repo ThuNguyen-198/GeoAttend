@@ -86,7 +86,7 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
 
           <View style={styles.innerContainer}>
             <RNPickerSelect
-              onValueChange={(value) => setSelectedValue(value)}
+              onValueChange={(value) => value && setSelectedValue(value)}
               items={courses.map((course) => ({
                 label: course.courseName,
                 value: course.courseId,
@@ -136,6 +136,7 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
             {/* Submit Button */}
             <View style={styles.buttonCenter}>
               <TouchableOpacity
+                disabled={!locationIsOn || !code || !selectedValue}
                 style={
                   locationIsOn && code && selectedValue
                     ? styles.submitButton
