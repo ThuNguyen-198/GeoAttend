@@ -28,8 +28,13 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
   ]);
   // const [location, setLocation] = useState("Kent State University");
   const [code, setCode] = useState("");
-  const { locationIsOn, location, turnOnLocation, turnOffLocation } =
-    useLocation();
+  const {
+    locationIsOn,
+    location,
+    locationName,
+    turnOnLocation,
+    turnOffLocation,
+  } = useLocation();
 
   useEffect(() => {
     if (course) {
@@ -117,7 +122,7 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
                   <Text style={styles.text}>
                     {locationIsOn ? (
                       location ? (
-                        `Lat: ${location.latitude}, Long: ${location.longitude}`
+                        locationName
                       ) : (
                         <View style={styles.loadingContainer}>
                           <Text>Getting your location... </Text>
