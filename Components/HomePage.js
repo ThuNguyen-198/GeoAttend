@@ -27,10 +27,8 @@ export default function HomePage({ navigation }) {
         setCourses(null);
         console.log("error :", fetchError);
       } else if (course) {
-        console.log("course:", course);
         setCourses(course);
         setFetchError(null);
-        console.log(courses);
       }
     };
     fetchCourses();
