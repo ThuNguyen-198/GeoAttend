@@ -9,6 +9,7 @@ import {
   Alert,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
@@ -25,9 +26,10 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
     { courseName: "Course B", courseId: "1125" },
     { courseName: "Course C", courseId: "1243" },
   ]);
-  const [location, setLocation] = useState("Kent State University");
+  // const [location, setLocation] = useState("Kent State University");
   const [code, setCode] = useState("");
-  const { locationIsOn, turnOnLocation, turnOffLocation } = useLocation();
+  const { locationIsOn, location, turnOnLocation, turnOffLocation } =
+    useLocation();
 
   useEffect(() => {
     if (course) {
@@ -114,7 +116,14 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
                   />
                   <Text style={styles.text}>
                     {locationIsOn ? (
-                      location
+                      location ? (
+                        `Lat: ${location.latitude}, Long: ${location.longitude}`
+                      ) : (
+                        <View style={styles.loadingContainer}>
+                          <Text>Getting your location... </Text>
+                          <ActivityIndicator size="small" color="#013976" />
+                        </View>
+                      )
                     ) : (
                       <Text>Please turn on your location</Text>
                     )}
@@ -266,6 +275,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     gap: 26,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 
