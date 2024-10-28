@@ -7,25 +7,26 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { QueryResult, QueryData, QueryError } from "@supabase/supabase-js";
 import { supabase } from "../backend/supabase";
 import { useEffect, useState } from "react";
+import AddNewCourse from "./AddNewCourse";
 
 export default function HomePage({ navigation }) {
   const [fetchError, setFetchError] = useState(null);
   const [courses, setCourses] = useState(null);
-  // const courses = [
-  //   { courseId: "112", courseName: "Advanced Database" },
-  //   { courseId: "136", courseName: "Capstone Project" },
-  //   { courseId: "143", courseName: "Advanced Algorithm" },
-  // ];
+  const [isAddCourseModalVisible, setAddCourseModalVisible] = useState(false);
+
+  const toggleAddCourseModal = () => {
+    setAddCourseModalVisible(!isAddCourseModalVisible);
+  };
+
   useEffect(() => {
     const fetchCourses = async () => {
       let { data: course, error } = await supabase.from("course").select("*");
       if (error) {
         setFetchError(error);
         setCourses(null);
-        console.log("error :", fetchError);
+        console.log("error :", error);
       } else if (course) {
         setCourses(course);
         setFetchError(null);
@@ -38,7 +39,9 @@ export default function HomePage({ navigation }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Courses</Text>
-        <MaterialCommunityIcons name="plus" size={38} color="#949494" />
+        <TouchableOpacity onPress={toggleAddCourseModal}>
+          <MaterialCommunityIcons name="plus" size={38} color="#949494" />
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -53,9 +56,15 @@ export default function HomePage({ navigation }) {
         )}
         keyExtractor={(item, index) => index.toString()}
       />
+
+      <AddNewCourse
+        isVisible={isAddCourseModalVisible}
+        toggleModal={toggleAddCourseModal}
+      />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
