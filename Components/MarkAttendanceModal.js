@@ -32,6 +32,7 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
     locationIsOn,
     location,
     locationName,
+    locationCity,
     turnOnLocation,
     turnOffLocation,
   } = useLocation();
@@ -122,7 +123,25 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
                   <Text style={styles.text}>
                     {locationIsOn ? (
                       location ? (
-                        locationName
+                        <View>
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              fontWeight: "bold",
+                              color: "#333",
+                            }}
+                          >
+                            {locationName}
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 12,
+                              color: "#333",
+                            }}
+                          >
+                            {locationCity}
+                          </Text>
+                        </View>
                       ) : (
                         <View style={styles.loadingContainer}>
                           <Text>Getting your location... </Text>

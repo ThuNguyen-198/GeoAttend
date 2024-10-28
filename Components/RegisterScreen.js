@@ -9,21 +9,64 @@ import {
   Keyboard,
   TouchableOpacity,
 } from "react-native";
+// Assuming you already have a Supabase client set up
+import { supabase } from "../backend/supabase";
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const isFormValid = name && email && password;
 
-  const handleRegister = () => {
-    if (isFormValid) {
-      Alert.alert("Registration Successful", `Welcome, ${name}`);
-    } else {
-      Alert.alert("Error", "Please fill out all fields");
-    }
-  };
+  // const handleRegister = async () => {
+  //   if (!isFormValid) {
+  //     Alert.alert("Error", "Please fill out all fields");
+  //     return;
+  //   }
+
+  //   try {
+  //     // Query Supabase to check if the email already exists
+  //     const { data: users, error } = await supabase
+  //       .from("auth.users") // Use the auth.users table to query for existing users
+  //       .select("email")
+  //       .eq("email", email);
+
+  //     if (error) throw error;
+
+  //     if (users.length > 0) {
+  //       // Email already exists
+  //       Alert.alert(
+  //         "Error",
+  //         "This email is already registered. Please use another one."
+  //       );
+  //       return;
+  //     }
+
+  //     // Proceed with registration if email doesn't exist
+  //     const { data, error: signUpError } = await supabase.auth.signUp({
+  //       email: email,
+  //       password: password,
+  //       options: {
+  //         data: { full_name: name },
+  //       },
+  //     });
+
+  //     if (signUpError) {
+  //       Alert.alert("Registration Error", signUpError.message);
+  //     } else if (data.user) {
+  //       Alert.alert("Registration Successful", `Welcome, ${name}`);
+  //       navigation.navigate("Login");
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     Alert.alert(
+  //       "Error",
+  //       "There was an issue checking your email. Please try again."
+  //     );
+  //   }
+  // };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -55,10 +98,12 @@ const RegisterScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={[styles.button, isFormValid ? null : styles.buttonDisabled]}
-          onPress={handleRegister}
-          disabled={!isFormValid}
+          // onPress={handleRegister}
+          disabled={!isFormValid || loading}
         >
-          <Text style={styles.buttonText}>Register</Text>
+          <Text style={styles.buttonText}>
+            {loading ? "Registering..." : "Register"}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.loginContainer}>

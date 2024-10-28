@@ -8,6 +8,7 @@ export const LocationProvider = ({ children }) => {
   const [locationIsOn, setLocationIsOn] = useState(false);
   const [location, setLocation] = useState(null);
   const [locationName, setLocationName] = useState(""); // Add location name state
+  const [locationCity, setLocationCity] = useState(""); // Add location name state
 
   const turnOnLocation = async () => {
     setLocationIsOn(true);
@@ -52,9 +53,9 @@ export const LocationProvider = ({ children }) => {
     console.log(reverseGeocode);
 
     if (reverseGeocode.length > 0) {
-      let { name } = reverseGeocode[0];
+      let { name, city, region, country } = reverseGeocode[0];
       setLocationName(name);
-      // setLocationName(`${city}, ${region}, ${country}`);
+      setLocationCity(`${city}, ${region}, ${country}`);
     }
 
     setLocationIsOn(true);
@@ -64,6 +65,7 @@ export const LocationProvider = ({ children }) => {
     setLocationIsOn(false);
     setLocation(null);
     setLocationName(""); // Reset location name
+    setLocationCity(""); // Reset location name
   };
 
   return (
@@ -72,6 +74,7 @@ export const LocationProvider = ({ children }) => {
         locationIsOn,
         location,
         locationName,
+        locationCity,
         turnOnLocation,
         turnOffLocation,
       }}
