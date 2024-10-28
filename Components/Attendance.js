@@ -26,7 +26,7 @@ export default function Attendance() {
       attendance: [
         { date: "2024-08-24 10:00:00", presence: true },
         { date: "2024-08-31 10:05:00", presence: false },
-        { date: "2024-09-07 10:02:00", presence: true },
+        { date: "2024-09-07 10:02:00", presence: false },
         { date: "2024-09-14 10:00:00", presence: true },
       ],
     },
@@ -35,7 +35,7 @@ export default function Attendance() {
       course_name: "Advanced Algorithm",
       attendance: [
         { date: "2024-08-24 10:00:00", presence: true },
-        { date: "2024-08-31 10:05:00", presence: false },
+        { date: "2024-08-31 10:05:00", presence: true },
         { date: "2024-09-07 10:02:00", presence: true },
         { date: "2024-09-14 10:00:00", presence: true },
       ],
@@ -54,6 +54,17 @@ export default function Attendance() {
     const date = datetime.toLocaleDateString("en-CA");
     return date;
   };
+  const countAttendance = (attendaceList) => {
+    const presence = attendaceList.filter((entry) => entry.presence === true);
+    return presence.length + "/" + attendaceList.length;
+  };
+  const attendanceColor = (attendaceList) => {
+    const presence = attendaceList.filter((entry) => entry.presence === true);
+    if (presence.length / attendaceList.length === 1) return "green";
+    else if (presence.length / attendaceList.length >= 0.75) return "yellow";
+    else return "red";
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -69,7 +80,18 @@ export default function Attendance() {
               onPress={() => toggleGroup(item.courseId)}
             >
               <Text style={styles.courseName}>{item.course_name}</Text>
-
+              <Text
+                style={[
+                  styles.attendanceCount,
+                  attendanceColor(item.attendance) === "green"
+                    ? styles.green
+                    : attendanceColor(item.attendance) === "yellow"
+                    ? styles.yellow
+                    : styles.red,
+                ]}
+              >
+                {countAttendance(item.attendance)}
+              </Text>
               <MaterialCommunityIcons
                 name={
                   expandedCourse === item.courseId
@@ -92,9 +114,9 @@ export default function Attendance() {
                         <Text style={styles.attendanceDate}>
                           {getWeekDay(item.date)}
                         </Text>
-                        <TextEncoderStream style={styles.attendanceDate}>
+                        <Text style={styles.attendanceDate}>
                           {getDate(item.date)}
-                        </TextEncoderStream>
+                        </Text>
                       </View>
 
                       <TouchableOpacity>
@@ -185,5 +207,19 @@ const styles = StyleSheet.create({
   attendanceDate: {
     fontSize: 16,
     color: "#424242",
+  },
+  attendanceCount: {
+    color: "#13B307",
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  green: {
+    color: "#13B307",
+  },
+  yellow: {
+    color: "#EFAB00",
+  },
+  red: {
+    color: "#BE0319",
   },
 });
