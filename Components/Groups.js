@@ -62,16 +62,26 @@ export default function Groups({ navigation }) {
               style={[styles.card, styles.row]}
               onPress={() => navigation.navigate("GroupDetails", { item })}
             >
-              <Text style={styles.item}>{item.groupName}</Text>
+              <Text style={styles.groupName}>{item.groupName}</Text>
               <TouchableOpacity onPress={() => toggleGroup(item.groupId)}>
-                <MaterialCommunityIcons
-                  name={
-                    expandedGroup === item.groupId
-                      ? "chevron-up"
-                      : "chevron-down"
-                  }
-                  style={styles.dropdownIcon}
-                />
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View
+                    style={{
+                      marginVertical: 10,
+                      borderLeftWidth: 0.3,
+                      borderLeftColor: "#424242",
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name={
+                        expandedGroup === item.groupId
+                          ? "chevron-up"
+                          : "chevron-down"
+                      }
+                      style={styles.groupDropDownIcon}
+                    />
+                  </View>
+                </View>
               </TouchableOpacity>
             </TouchableOpacity>
 
@@ -142,7 +152,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#fff",
-    padding: 20,
+    paddingHorizontal: 20,
     marginVertical: 10,
     borderRadius: 8,
     shadowColor: "#000",
@@ -158,6 +168,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  groupName: {
+    fontSize: 18,
+    color: "#013976",
+    paddingVertical: 10,
+  },
+  groupDropDownIcon: {
+    // minWidth: 50,
+    fontSize: 30,
+    color: "#424242",
+    paddingLeft: 30,
+    paddingVertical: 10,
+  },
   memberRow: {
     height: 60,
     flexDirection: "row",
@@ -169,14 +191,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     gap: 20,
-  },
-  item: {
-    fontSize: 18,
-    color: "#013976",
-  },
-  dropdownIcon: {
-    fontSize: 30,
-    color: "#424242",
   },
   memberName: {
     fontSize: 16,
