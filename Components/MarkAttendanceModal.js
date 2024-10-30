@@ -9,6 +9,7 @@ import {
   Alert,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
@@ -25,9 +26,16 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
     { courseName: "Course B", courseId: "1125" },
     { courseName: "Course C", courseId: "1243" },
   ]);
-  const [location, setLocation] = useState("Kent State University");
+  // const [location, setLocation] = useState("Kent State University");
   const [code, setCode] = useState("");
-  const { locationIsOn, turnOnLocation, turnOffLocation } = useLocation();
+  const {
+    locationIsOn,
+    location,
+    locationName,
+    locationCity,
+    turnOnLocation,
+    turnOffLocation,
+  } = useLocation();
 
   useEffect(() => {
     if (course) {
@@ -86,7 +94,7 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
 
           <View style={styles.innerContainer}>
             <RNPickerSelect
-              onValueChange={(value) => setSelectedValue(value)}
+              onValueChange={(value) => value && setSelectedValue(value)}
               items={courses.map((course) => ({
                 label: course.courseName,
                 value: course.courseId,
@@ -114,7 +122,32 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
                   />
                   <Text style={styles.text}>
                     {locationIsOn ? (
-                      location
+                      location ? (
+                        <View>
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              fontWeight: "bold",
+                              color: "#333",
+                            }}
+                          >
+                            {locationName}
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 12,
+                              color: "#333",
+                            }}
+                          >
+                            {locationCity}
+                          </Text>
+                        </View>
+                      ) : (
+                        <View style={styles.loadingContainer}>
+                          <Text>Getting your location... </Text>
+                          <ActivityIndicator size="small" color="#013976" />
+                        </View>
+                      )
                     ) : (
                       <Text>Please turn on your location</Text>
                     )}
@@ -136,6 +169,7 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
             {/* Submit Button */}
             <View style={styles.buttonCenter}>
               <TouchableOpacity
+                disabled={!locationIsOn || !code || !selectedValue}
                 style={
                   locationIsOn && code && selectedValue
                     ? styles.submitButton
@@ -265,6 +299,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     gap: 26,
+  },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 

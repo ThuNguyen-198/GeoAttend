@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderColor: "#A4A4A4",
   },
-  shadow: {},
   cardName: {
     fontSize: 18,
     color: "#013976",
