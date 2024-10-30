@@ -7,6 +7,10 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import AppNavigator from "./navigation/AppNavigator";
 import "./gesture-handler";
 import { LocationProvider } from "./context/LocationContext";
+import AppNavigator from "./navigation/AppNavigator";
+import { useEffect } from "react";
+import { Linking } from "react-native";
+import { supabase } from "./backend/supabase";
 
 export default function App() {
   return (

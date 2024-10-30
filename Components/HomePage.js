@@ -10,8 +10,12 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { QueryResult, QueryData, QueryError } from "@supabase/supabase-js";
 import { supabase } from "../backend/supabase";
 import { useEffect, useState } from "react";
+import { supabase } from "../backend/supabase";
 
+import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 export default function HomePage({ navigation }) {
+const something = supabase .from("course").select('*');
+  console.log(something)
   const [fetchError, setFetchError] = useState(null);
   const [courses, setCourses] = useState(null);
   // const courses = [
@@ -33,7 +37,6 @@ export default function HomePage({ navigation }) {
     };
     fetchCourses();
   }, []);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
