@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
+import { supabase } from "../backend/supabase";
 
 const AuthContext = createContext();
 

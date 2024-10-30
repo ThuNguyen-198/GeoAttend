@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import { supabase } from "../backend/supabase"; // Adjust the path as necessary
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
