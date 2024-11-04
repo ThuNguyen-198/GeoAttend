@@ -8,5 +8,6 @@ export const supabase = createClient(SUPABASE_URL, ANON_KEY, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    redirectTo: "geoattend://auth/callback",
   },
 });

@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomePage from "../Components/HomePage";
 import Attendance from "../Components/Attendance";
-import Groups from "../Components/Groups";
+import GroupsScreen from "../Components/GroupsScreen";
 import Messages from "../Components/Messages";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CourseNavigator from "./CourseNavigator";

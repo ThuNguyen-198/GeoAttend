@@ -12,7 +12,7 @@ import {
 import Modal from "react-native-modal";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const AddNewCourse = ({ isVisible, toggleModal }) => {
+const AddNewCourse = ({ isVisible, onClose, toggleModal }) => {
   const [courseInput, setCourseInput] = useState("");
   const [isCourseDisplayed, setDisplayCourse] = useState(false);
   const [courseToAdd, setCourseToAdd] = useState({});
@@ -20,12 +20,12 @@ const AddNewCourse = ({ isVisible, toggleModal }) => {
     {
       id: "1",
       class_id: "100",
-      course_name: "new course 1",
+      course_name: "New Course 1",
     },
     {
       id: "2",
-      class_id: "285",
-      course_name: "new course 2",
+      class_id: "200",
+      course_name: "New Course 2",
     },
   ];
 
@@ -38,6 +38,13 @@ const AddNewCourse = ({ isVisible, toggleModal }) => {
       setDisplayCourse(false);
       Alert.alert("Course Not Found", "This course ID doesn't exist.");
     }
+  };
+  const handleAddCourse = () => {
+    Alert.alert(
+      "Course Added",
+      `${courseToAdd.course_name} has been added to your courses`
+    );
+    onClose();
   };
 
   return (
@@ -75,18 +82,18 @@ const AddNewCourse = ({ isVisible, toggleModal }) => {
               />
 
               <TouchableOpacity
-                style={styles.searchButton}
+                style={styles.button}
                 onPress={handleDisplayCourse}
               >
                 <Text style={styles.buttonText}>Search</Text>
               </TouchableOpacity>
             </View>
             {isCourseDisplayed && (
-              <View style={[styles.card, styles.row]}>
+              <View style={[styles.card]}>
                 <Text style={styles.courseName}>{courseToAdd.course_name}</Text>
                 <TouchableOpacity
-                  style={styles.searchButton}
-                  onPress={handleDisplayCourse}
+                  style={styles.button}
+                  onPress={handleAddCourse}
                 >
                   <Text style={styles.buttonText}>Add</Text>
                 </TouchableOpacity>
@@ -155,8 +162,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 16,
   },
-  searchButton: {
-    backgroundColor: "#f0a500",
+  button: {
+    backgroundColor: "#013976",
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 25,

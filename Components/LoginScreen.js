@@ -10,11 +10,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
+import { supabase } from "../backend/supabase";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const { login, signInWithGoogle } = useAuth();
 
   const isFormValid = email && password;
   const handleLogin = () => {
@@ -25,8 +26,8 @@ const LoginScreen = ({ navigation }) => {
     Alert.alert("Login with Microsoft", "Microsoft login functionality");
   };
 
-  const handleGoogleLogin = () => {
-    Alert.alert("Login with Google", "Google login functionality");
+  const handleGoogleLogin = async () => {
+    await signInWithGoogle();
   };
 
   return (

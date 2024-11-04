@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-export default function Groups({ navigation }) {
+export default function GroupsScreen({ navigation }) {
   const [expandedGroup, setExpandedGroup] = useState(null);
 
   const myGroups = [

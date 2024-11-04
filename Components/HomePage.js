@@ -5,35 +5,53 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { supabase } from "../backend/supabase";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AddNewCourse from "./AddNewCourse";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomePage({ navigation }) {
   const [fetchError, setFetchError] = useState(null);
   const [courses, setCourses] = useState(null);
   const [isAddCourseModalVisible, setAddCourseModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const previousCourses = useRef(null);
 
   const toggleAddCourseModal = () => {
     setAddCourseModalVisible(!isAddCourseModalVisible);
   };
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      let { data: course, error } = await supabase.from("course").select("*");
-      if (error) {
-        setFetchError(error);
-        setCourses(null);
-        console.log("error :", error);
-      } else if (course) {
+  const fetchCourses = async () => {
+    if (
+      !courses ||
+      JSON.stringify(previousCourses.current) !== JSON.stringify(courses)
+    ) {
+      setIsLoading(true);
+    }
+    let { data: course, error } = await supabase.from("course").select("*");
+    if (error) {
+      setFetchError(error);
+      setCourses(null);
+      console.log("error :", error);
+      setIsLoading(false);
+    } else if (course) {
+      if (JSON.stringify(previousCourses.current) !== JSON.stringify(course)) {
         setCourses(course);
-        setFetchError(null);
+        previousCourses.current = course;
       }
-    };
-    fetchCourses();
-  }, []);
+      setFetchError(null);
+    }
+    setIsLoading(false);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchCourses();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -43,22 +61,28 @@ export default function HomePage({ navigation }) {
           <MaterialCommunityIcons name="plus" size={38} color="#949494" />
         </TouchableOpacity>
       </View>
-
-      <FlatList
-        data={courses}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate("CourseDetails", { item })}
-            style={styles.card}
-          >
-            <Text style={styles.item}>{item.course_name}</Text>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item, index) => index.toString()}
-      />
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#013976" style={styles.loader} />
+      ) : (
+        <FlatList
+          data={courses}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("CourseDetails", { item })}
+              style={styles.card}
+            >
+              <Text style={styles.item}>{item.course_name}</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      )}
 
       <AddNewCourse
         isVisible={isAddCourseModalVisible}
+        onClose={() => {
+          setAddCourseModalVisible(false);
+        }}
         toggleModal={toggleAddCourseModal}
       />
     </View>
