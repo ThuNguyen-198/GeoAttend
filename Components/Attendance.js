@@ -41,7 +41,7 @@ export default function Attendance() {
       ],
     },
   ];
-  const toggleGroup = (courseId) => {
+  const toggleCourse = (courseId) => {
     setExpandedCourse(expandedCourse === courseId ? null : courseId);
   };
   const getWeekDay = (datetimeString) => {
@@ -77,7 +77,7 @@ export default function Attendance() {
           <View>
             <TouchableOpacity
               style={[styles.card, styles.row]}
-              onPress={() => toggleGroup(item.courseId)}
+              onPress={() => toggleCourse(item.courseId)}
             >
               <Text style={styles.courseName}>{item.course_name}</Text>
               <Text

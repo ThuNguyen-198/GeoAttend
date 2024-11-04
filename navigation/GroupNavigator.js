@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Groups from "../Components/Groups";
+import GroupsScreen from "../Components/GroupsScreen";
 import GroupDetails from "../Components/GroupDetails";
 export default function GroupNavigator() {
   const Stack = createNativeStackNavigator();
@@ -8,7 +8,7 @@ export default function GroupNavigator() {
     <Stack.Navigator initialRouteName="Groups">
       <Stack.Screen
         name="Groups"
-        component={Groups}
+        component={GroupsScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

@@ -5,57 +5,90 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { QueryResult, QueryData, QueryError } from "@supabase/supabase-js";
 import { supabase } from "../backend/supabase";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import AddNewCourse from "./AddNewCourse";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomePage({ navigation }) {
   const [fetchError, setFetchError] = useState(null);
   const [courses, setCourses] = useState(null);
-  // const courses = [
-  //   { courseId: "112", courseName: "Advanced Database" },
-  //   { courseId: "136", courseName: "Capstone Project" },
-  //   { courseId: "143", courseName: "Advanced Algorithm" },
-  // ];
-  useEffect(() => {
-    const fetchCourses = async () => {
-      let { data: course, error } = await supabase.from("course").select("*");
-      if (error) {
-        setFetchError(error);
-        setCourses(null);
-        console.log("error :", fetchError);
-      } else if (course) {
+  const [isAddCourseModalVisible, setAddCourseModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const previousCourses = useRef(null);
+
+  const toggleAddCourseModal = () => {
+    setAddCourseModalVisible(!isAddCourseModalVisible);
+  };
+
+  const fetchCourses = async () => {
+    if (
+      !courses ||
+      JSON.stringify(previousCourses.current) !== JSON.stringify(courses)
+    ) {
+      setIsLoading(true);
+    }
+    let { data: course, error } = await supabase.from("course").select("*");
+    if (error) {
+      setFetchError(error);
+      setCourses(null);
+      console.log("error :", error);
+      setIsLoading(false);
+    } else if (course) {
+      if (JSON.stringify(previousCourses.current) !== JSON.stringify(course)) {
         setCourses(course);
-        setFetchError(null);
+        previousCourses.current = course;
       }
-    };
-    fetchCourses();
-  }, []);
+      setFetchError(null);
+    }
+    setIsLoading(false);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchCourses();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Courses</Text>
-        <MaterialCommunityIcons name="plus" size={38} color="#949494" />
+        <TouchableOpacity onPress={toggleAddCourseModal}>
+          <MaterialCommunityIcons name="plus" size={38} color="#949494" />
+        </TouchableOpacity>
       </View>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#013976" style={styles.loader} />
+      ) : (
+        <FlatList
+          data={courses}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("CourseDetails", { item })}
+              style={styles.card}
+            >
+              <Text style={styles.item}>{item.course_name}</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      )}
 
-      <FlatList
-        data={courses}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate("CourseDetails", { item })}
-            style={styles.card}
-          >
-            <Text style={styles.item}>{item.course_name}</Text>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item, index) => index.toString()}
+      <AddNewCourse
+        isVisible={isAddCourseModalVisible}
+        onClose={() => {
+          setAddCourseModalVisible(false);
+        }}
+        toggleModal={toggleAddCourseModal}
       />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
