@@ -1,52 +1,63 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { supabase } from "../backend/supabase";
 import { Linking } from "react-native";
-
+import { Session } from "@supabase/supabase-js";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState(null);
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        setIsLoading(true);
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
 
-        if (session) {
-          console.log("Session found:", session);
-          setIsAuthenticated(true);
-        } else {
-          console.log("No session found.");
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error("Error checking session:", error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkSession();
-
-    // Add a listener for auth state changes to keep `isAuthenticated` updated
-    const { subscription } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session) {
-          console.log("Auth state changed - user logged in:", session);
-          setIsAuthenticated(true);
-        } else {
-          console.log("Auth state changed - user logged out.");
-          setIsAuthenticated(false);
-        }
-      }
-    );
-
-    return () => subscription?.unsubscribe?.(); // Safely handle unsubscribing
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
   }, []);
+
+  // useEffect(() => {
+  //   const checkSession = async () => {
+  //     try {
+  //       setIsLoading(true);
+  //       const {
+  //         data: { session },
+  //       } = await supabase.auth.getSession();
+
+  //       if (session) {
+  //         console.log("Session found:", session);
+  //         setIsAuthenticated(true);
+  //       } else {
+  //         console.log("No session found.");
+  //         setIsAuthenticated(false);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error checking session:", error.message);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   checkSession();
+
+  //   // Add a listener for auth state changes to keep `isAuthenticated` updated
+  //   const { subscription } = supabase.auth.onAuthStateChange(
+  //     (event, session) => {
+  //       if (session) {
+  //         console.log("Auth state changed - user logged in:", session);
+  //         setIsAuthenticated(true);
+  //       } else {
+  //         console.log("Auth state changed - user logged out.");
+  //         setIsAuthenticated(false);
+  //       }
+  //     }
+  //   );
+
+  //   return () => subscription?.unsubscribe?.(); // Safely handle unsubscribing
+  // }, []);
 
   const login = () => setIsAuthenticated(true);
 
@@ -91,7 +102,14 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isLoading, login, logout, signInWithGoogle }}
+      value={{
+        session,
+        isAuthenticated,
+        isLoading,
+        login,
+        logout,
+        signInWithGoogle,
+      }}
     >
       {children}
     </AuthContext.Provider>

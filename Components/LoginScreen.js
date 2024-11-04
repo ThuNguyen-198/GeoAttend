@@ -15,13 +15,27 @@ import { supabase } from "../backend/supabase";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, signInWithGoogle } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { session, login, signInWithGoogle } = useAuth();
 
   const isFormValid = email && password;
   const handleLogin = () => {
     Alert.alert("Error", "Please enter both email and password");
   };
 
+  async function signInWithEmail() {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+    if (error) Alert.alert(error.message);
+    else {
+      setEmail("");
+      setPassword("");
+    }
+    setLoading(false);
+  }
   const handleMicrosoftLogin = () => {
     Alert.alert("Login with Microsoft", "Microsoft login functionality");
   };
@@ -37,7 +51,7 @@ const LoginScreen = ({ navigation }) => {
 
         <TextInput
           style={styles.input}
-          placeholder="Phone number, username, or email"
+          placeholder="Email@address.com"
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
@@ -53,7 +67,7 @@ const LoginScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={[styles.button, isFormValid ? null : styles.buttonDisabled]}
-          onPress={login}
+          onPress={signInWithEmail}
           disabled={!isFormValid}
         >
           <Text style={styles.buttonText}>Log in</Text>

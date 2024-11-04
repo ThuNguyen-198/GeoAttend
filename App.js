@@ -8,26 +8,26 @@ import { Linking } from "react-native";
 import { supabase } from "./backend/supabase";
 
 export default function App() {
-  useEffect(() => {
-    const handleUrl = (url) => {
-      const { path } = Linking.parse(url);
-      if (path === "auth") {
-        supabase.auth.getSession().then(({ data }) => {
-          if (data.session) {
-            console.log("User is authenticated:", data.session.user);
-          } else {
-            console.log("User not authenticated");
-          }
-        });
-      }
-    };
+  // useEffect(() => {
+  //   const handleUrl = (url) => {
+  //     const { path } = Linking.parse(url);
+  //     if (path === "auth") {
+  //       supabase.auth.getSession().then(({ data }) => {
+  //         if (data.session) {
+  //           console.log("User is authenticated:", data.session.user);
+  //         } else {
+  //           console.log("User not authenticated");
+  //         }
+  //       });
+  //     }
+  //   };
 
-    const linkingSubscription = Linking.addEventListener("url", handleUrl);
+  //   const linkingSubscription = Linking.addEventListener("url", handleUrl);
 
-    return () => {
-      linkingSubscription.remove();
-    };
-  }, []);
+  //   return () => {
+  //     linkingSubscription.remove();
+  //   };
+  // }, []);
 
   return (
     <View style={styles.container}>

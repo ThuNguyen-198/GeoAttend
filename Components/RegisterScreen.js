@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,10 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
-// Assuming you already have a Supabase client set up
+
 import { supabase } from "../backend/supabase";
 
 const RegisterScreen = ({ navigation }) => {
@@ -19,6 +21,30 @@ const RegisterScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const isFormValid = name && email && password;
+
+  async function signUpWithEmail() {
+    setLoading(true);
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: { full_name: name },
+      },
+    });
+    if (error) {
+      Alert.alert(error.message);
+    } else {
+      navigation.navigate("Login");
+      setEmail("");
+      setPassword("");
+    }
+    if (!session)
+      Alert.alert("Please check your inbox for email verification!");
+    setLoading(false);
+  }
 
   // const handleRegister = async () => {
   //   if (!isFormValid) {
@@ -69,54 +95,60 @@ const RegisterScreen = ({ navigation }) => {
   // };
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.container}>
-        <Text style={styles.title}>GeoAttend</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={100}
+    >
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={styles.container}>
+          <Text style={styles.title}>GeoAttend</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          value={name}
-          onChangeText={setName}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            value={name}
+            onChangeText={setName}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-        <TouchableOpacity
-          style={[styles.button, isFormValid ? null : styles.buttonDisabled]}
-          // onPress={handleRegister}
-          disabled={!isFormValid || loading}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? "Registering..." : "Register"}
-          </Text>
-        </TouchableOpacity>
-
-        <View style={styles.loginContainer}>
-          <Text>Already have an account?</Text>
-          <Text
-            style={styles.loginText}
-            onPress={() => navigation.navigate("Login")}
+          <TouchableOpacity
+            style={[styles.button, isFormValid ? null : styles.buttonDisabled]}
+            onPress={signUpWithEmail}
+            disabled={!isFormValid || loading}
           >
-            Log in
-          </Text>
+            <Text style={styles.buttonText}>
+              {loading ? "Registering..." : "Register"}
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.loginContainer}>
+            <Text>Already have an account?</Text>
+            <Text
+              style={styles.loginText}
+              onPress={() => navigation.navigate("Login")}
+            >
+              Log in
+            </Text>
+          </View>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

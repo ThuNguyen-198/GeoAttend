@@ -8,7 +8,7 @@ import MenuDrawerNavigator from "./MenuDrawerNavigator";
 import * as Linking from "expo-linking";
 
 const AppNavigator = () => {
-  const { isAuthenticated } = useAuth();
+  const { session } = useAuth();
 
   useEffect(() => {
     const handleDeepLink = (event) => {
@@ -29,7 +29,7 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <MenuDrawerNavigator /> : <AuthNavigator />}
+      {session && session.user ? <MenuDrawerNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
 };
