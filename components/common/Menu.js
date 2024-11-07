@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function Menu() {
-  const { professorMode, setProfessorMode, logout } = useAuth();
+  const { userRole, professorMode, setProfessorMode, logout } = useAuth();
   const handleSwitchBetweenProfAndStudentMode = () => {
     setProfessorMode(!professorMode);
   };
@@ -29,21 +29,23 @@ export default function Menu() {
         <MaterialCommunityIcons style={styles.menuIcon} name="cog-outline" />
         <Text style={styles.menuItemText}>Setting</Text>
       </View>
+      {userRole === "professor" && (
+        <TouchableOpacity
+          style={styles.row}
+          onPress={handleSwitchBetweenProfAndStudentMode}
+        >
+          <MaterialCommunityIcons
+            style={styles.menuIcon}
+            name="account-switch-outline"
+          />
 
-      <TouchableOpacity
-        style={styles.row}
-        onPress={handleSwitchBetweenProfAndStudentMode}
-      >
-        <MaterialCommunityIcons
-          style={styles.menuIcon}
-          name="account-switch-outline"
-        />
-        {professorMode ? (
-          <Text style={styles.menuItemText}>Student Mode</Text>
-        ) : (
-          <Text style={styles.menuItemText}>Professor Mode</Text>
-        )}
-      </TouchableOpacity>
+          {professorMode ? (
+            <Text style={styles.menuItemText}>Student Mode</Text>
+          ) : (
+            <Text style={styles.menuItemText}>Professor Mode</Text>
+          )}
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity style={styles.row} onPress={logout}>
         <MaterialCommunityIcons style={styles.menuIcon} name="logout" />

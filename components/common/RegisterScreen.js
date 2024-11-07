@@ -13,17 +13,20 @@ import {
 } from "react-native";
 
 import { supabase } from "../../backend/supabase";
+import { CheckBox } from "react-native-elements";
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isProfessor, setIsProfessor] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const isFormValid = name && email && password;
 
   async function signUpWithEmail() {
     setLoading(true);
+    const role = isProfessor ? "professor" : "student";
     const {
       data: { session },
       error,
@@ -31,7 +34,7 @@ const RegisterScreen = ({ navigation }) => {
       email: email,
       password: password,
       options: {
-        data: { full_name: name, role: "professor" },
+        data: { full_name: name, role: role },
       },
     });
     if (error) {
@@ -125,6 +128,13 @@ const RegisterScreen = ({ navigation }) => {
             secureTextEntry
             value={password}
             onChangeText={setPassword}
+          />
+
+          <CheckBox
+            title="I am a professor"
+            checked={isProfessor}
+            onPress={() => setIsProfessor(!isProfessor)}
+            containerStyle={{ backgroundColor: "#fff", borderColor: "#fff" }}
           />
 
           <TouchableOpacity

@@ -12,16 +12,21 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSignoutLoading, setIsLoadingSignout] = useState(false);
   const [session, setSession] = useState(null);
+  const [userRole, setUserRole] = useState("student");
   const [professorMode, setProfessorMode] = useState(false);
   const redirectTo = makeRedirectUri();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      console.log(JSON.stringify(session, null, 2));
 
       if (session && session.user && session.user.user_metadata) {
         const role = session.user.user_metadata.role;
-        if (role === "professor") setProfessorMode(true);
+        if (role === "professor") {
+          setUserRole("professor");
+          setProfessorMode(true);
+        }
       }
     });
 
@@ -29,7 +34,10 @@ export const AuthProvider = ({ children }) => {
       setSession(session);
       if (session && session.user && session.user.user_metadata) {
         const role = session.user.user_metadata.role;
-        if (role === "professor") setProfessorMode(true);
+        if (role === "professor") {
+          setUserRole("professor");
+          setProfessorMode(true);
+        }
       }
     });
   }, []);
@@ -161,6 +169,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         session,
         isAuthenticated,
+        userRole,
         professorMode,
         setProfessorMode,
         logout,

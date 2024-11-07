@@ -9,7 +9,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 const Drawer = createDrawerNavigator();
 
 export default function MenuDrawerNavigator() {
-  const { session, professorMode, isSignoutLoading } = useAuth();
+  const { session, userRole, professorMode, isSignoutLoading } = useAuth();
   return (
     <View style={{ flex: 1 }}>
       {isSignoutLoading && (
@@ -25,7 +25,7 @@ export default function MenuDrawerNavigator() {
         }}
         drawerContent={() => <Menu />}
       >
-        {professorMode ? (
+        {userRole === "professor" && professorMode ? (
           <Drawer.Screen name="ProfTabNavigator" component={ProfTabNavigator} />
         ) : (
           <Drawer.Screen name="TabNavigator" component={TabNavigator} />
