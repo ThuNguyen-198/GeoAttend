@@ -12,7 +12,7 @@ import {
   Platform,
 } from "react-native";
 
-import { supabase } from "../backend/supabase";
+import { supabase } from "../../backend/supabase";
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -31,7 +31,7 @@ const RegisterScreen = ({ navigation }) => {
       email: email,
       password: password,
       options: {
-        data: { full_name: name },
+        data: { full_name: name, role: "professor" },
       },
     });
     if (error) {

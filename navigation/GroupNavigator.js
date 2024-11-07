@@ -1,13 +1,13 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import GroupsScreen from "../Components/GroupsScreen";
-import GroupDetails from "../Components/GroupDetails";
+import GroupsScreen from "../components/student/GroupsScreen";
+import GroupDetails from "../components/student/GroupDetails";
 export default function GroupNavigator() {
   const Stack = createNativeStackNavigator();
   return (
-    <Stack.Navigator initialRouteName="Groups">
+    <Stack.Navigator initialRouteName="Group">
       <Stack.Screen
-        name="Groups"
+        name="Group"
         component={GroupsScreen}
         options={{ headerShown: false }}
       />

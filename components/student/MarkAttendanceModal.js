@@ -14,7 +14,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import RNPickerSelect from "react-native-picker-select";
-import { useLocation } from "../context/LocationContext";
+import { useLocation } from "../../context/LocationContext";
 
 const MarkAttendanceModal = ({ visible, onClose, course }) => {
   const [selectedValue, setSelectedValue] = useState(null);

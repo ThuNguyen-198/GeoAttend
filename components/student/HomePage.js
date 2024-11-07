@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { supabase } from "../backend/supabase";
+import { supabase } from "../../backend/supabase";
 import React, { useEffect, useRef, useState } from "react";
 import AddNewCourse from "./AddNewCourse";
 import { useFocusEffect } from "@react-navigation/native";

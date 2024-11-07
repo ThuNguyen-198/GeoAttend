@@ -11,7 +11,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import { useLocation } from "../context/LocationContext";
-import MarkAttendanceModal from "../Components/MarkAttendanceModal";
+import MarkAttendanceModal from "../components/student/MarkAttendanceModal";
 
 const MarkAttendanceButton = ({ children }) => {
   const [location, setLocation] = useState("Kent State University");

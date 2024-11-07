@@ -9,6 +9,9 @@ import * as Linking from "expo-linking";
 
 const AppNavigator = () => {
   const { session } = useAuth();
+  // useEffect(() => {
+  //   console.log("here's the session: ", JSON.stringify(session, null, 2));
+  // }, [session]);
 
   useEffect(() => {
     const handleDeepLink = (event) => {

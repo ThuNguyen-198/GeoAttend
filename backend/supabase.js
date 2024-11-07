@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import "react-native-url-polyfill/auto";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, ANON_KEY } from "@env";
 import { AppState } from "react-native";

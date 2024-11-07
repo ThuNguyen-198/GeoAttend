@@ -1,19 +1,23 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomePage from "../components/student/HomePage";
-import Attendance from "../components/student/Attendance";
-import GroupsScreen from "../components/student/GroupsScreen";
-import Messages from "../components/student/Messages";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CourseNavigator from "./CourseNavigator";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-
 import MarkAttendanceButton from "./MarkAttendanceButton";
 import { useLocation } from "../context/LocationContext";
 import MessageNavigator from "./MessageNavigator";
-import GroupNavigator from "./GroupNavigator";
+import { useAuth } from "../context/AuthContext";
 
-export default function TabNavigator() {
+export default function ProfTabNavigator() {
+  const { isSignoutLoading } = useAuth();
   const Tab = createBottomTabNavigator();
   const navigation = useNavigation();
   const { locationIsOn } = useLocation();
@@ -24,6 +28,7 @@ export default function TabNavigator() {
     return (
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>GeoAttend</Text>
+
         <View style={styles.pair}>
           <MaterialCommunityIcons
             name={
@@ -68,7 +73,7 @@ export default function TabNavigator() {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Attendance"
         component={Attendance}
         options={{
@@ -80,7 +85,7 @@ export default function TabNavigator() {
             />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="MarkAttendance"
         component={HomePage}
@@ -90,7 +95,7 @@ export default function TabNavigator() {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Groups"
         component={GroupNavigator}
         options={{
@@ -102,7 +107,7 @@ export default function TabNavigator() {
             />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Messages"
         component={MessageNavigator}
