@@ -8,19 +8,14 @@
     "userInterfaceStyle": "light",
     "scheme": "geoattend",
     "platforms": ["ios", "android"],
-    "ios": {
-      "bundleIdentifier": "com.yourcompany.geoattend"
-    },
-    "android": {
-      "package": "com.yourcompany.geoattend"
-    },
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "geoattend"
     },
     "android": {
       "adaptiveIcon": {

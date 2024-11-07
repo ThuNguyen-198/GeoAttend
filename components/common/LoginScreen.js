@@ -8,9 +8,16 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { useAuth } from "../context/AuthContext";
-import { supabase } from "../backend/supabase";
+import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../backend/supabase";
+import { Session } from "@supabase/supabase-js";
+import { makeRedirectUri } from "expo-auth-session";
+import * as QueryParams from "expo-auth-session/build/QueryParams";
+import * as WebBrowser from "expo-web-browser";
+import * as Linking from "expo-linking";
+import { BlurView } from "@react-native-community/blur";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -41,12 +48,73 @@ const LoginScreen = ({ navigation }) => {
   };
 
   const handleGoogleLogin = async () => {
-    await signInWithGoogle();
+    await performOAuth();
   };
+  WebBrowser.maybeCompleteAuthSession(); // required for web only
+  const redirectTo = makeRedirectUri();
+
+  const createSessionFromUrl = async (url) => {
+    const { params, errorCode } = QueryParams.getQueryParams(url);
+
+    if (errorCode) throw new Error(errorCode);
+    const { access_token, refresh_token } = params;
+
+    if (!access_token) return;
+
+    const { data, error } = await supabase.auth.setSession({
+      access_token,
+      refresh_token,
+    });
+    if (error) throw error;
+    console.log("session data: ", data);
+    return data.session;
+  };
+
+  const performOAuth = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo,
+        skipBrowserRedirect: true,
+      },
+    });
+    if (error) throw error;
+
+    const res = await WebBrowser.openAuthSessionAsync(
+      data?.url ?? "",
+      redirectTo
+    );
+
+    if (res.type === "success") {
+      const { url } = res;
+      await createSessionFromUrl(url);
+    }
+  };
+
+  // const sendMagicLink = async () => {
+  //   const { error } = await supabase.auth.signInWithOtp({
+  //     email: "example@email.com",
+  //     options: {
+  //       emailRedirectTo: redirectTo,
+  //     },
+  //   });
+
+  //   if (error) throw error;
+  //   // Email sent.
+  // };
+  const url = Linking.useURL();
+  console.log(url);
+  if (url) createSessionFromUrl(url);
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
+        {/* Show loading indicator */}
+        {loading && (
+          <View style={styles.overlay}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        )}
         <Text style={styles.title}>GeoAttend</Text>
 
         <TextInput
@@ -120,6 +188,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 22,
     backgroundColor: "#fff",
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent white
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10, // Ensure it appears above other elements
   },
   title: {
     fontSize: 34,

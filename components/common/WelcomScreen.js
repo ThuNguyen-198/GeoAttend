@@ -6,10 +6,13 @@ export default function WelcomeScreen({ navigation }) {
     <ImageBackground
       // blurRadius={10}
       style={styles.background}
-      source={require("../assets/Background.jpeg")}
+      source={require("../../assets/Background.jpeg")}
     >
       <View style={styles.logoContainer}>
-        <Image style={styles.logo} source={require("../assets/AppLogo.png")} />
+        <Image
+          style={styles.logo}
+          source={require("../../assets/AppLogo.png")}
+        />
         <Text style={styles.tagline}>GeoAttend</Text>
       </View>
       <View style={styles.buttonsContainer}>

@@ -16,7 +16,7 @@ export default function Messages({ navigation }) {
     {
       userId: "1",
       userName: "Jagr Groubert",
-      userImage: require("../assets/profilePicture.png"),
+      userImage: require("../../assets/profilePicture.png"),
       Messages: [
         {
           date: "10/21/2024",

@@ -1,17 +1,20 @@
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { View, Image, Button, Text, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function Menu() {
-  const { logout } = useAuth();
+  const { userRole, professorMode, setProfessorMode, logout } = useAuth();
+  const handleSwitchBetweenProfAndStudentMode = () => {
+    setProfessorMode(!professorMode);
+  };
   return (
     <DrawerContentScrollView style={styles.container}>
       <View style={styles.row}>
         <Image
           style={styles.image}
-          source={require("../assets/profilePicture.png")}
+          source={require("../../assets/profilePicture.png")}
         />
         <Text style={styles.nameText}>Thu Nguyen</Text>
       </View>
@@ -26,6 +29,24 @@ export default function Menu() {
         <MaterialCommunityIcons style={styles.menuIcon} name="cog-outline" />
         <Text style={styles.menuItemText}>Setting</Text>
       </View>
+      {userRole === "professor" && (
+        <TouchableOpacity
+          style={styles.row}
+          onPress={handleSwitchBetweenProfAndStudentMode}
+        >
+          <MaterialCommunityIcons
+            style={styles.menuIcon}
+            name="account-switch-outline"
+          />
+
+          {professorMode ? (
+            <Text style={styles.menuItemText}>Student Mode</Text>
+          ) : (
+            <Text style={styles.menuItemText}>Professor Mode</Text>
+          )}
+        </TouchableOpacity>
+      )}
+
       <TouchableOpacity style={styles.row} onPress={logout}>
         <MaterialCommunityIcons style={styles.menuIcon} name="logout" />
         <Text style={styles.menuItemText}>Log out</Text>

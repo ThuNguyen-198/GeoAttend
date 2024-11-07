@@ -1,7 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomePage from "../Components/HomePage";
-import CourseDetails from "../Components/CourseDetails";
+import HomePage from "../components/student/HomePage";
+import CourseDetails from "../components/student/CourseDetails";
 export default function CourseNavigator() {
   const Stack = createNativeStackNavigator();
   return (

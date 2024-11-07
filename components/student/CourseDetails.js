@@ -12,7 +12,7 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
-import { useLocation } from "../context/LocationContext";
+import { useLocation } from "../../context/LocationContext";
 import MarkAttendanceModal from "./MarkAttendanceModal";
 
 export default function CourseDetails() {
