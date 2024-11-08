@@ -1,5 +1,5 @@
 import { DrawerContentScrollView } from "@react-navigation/drawer";
-import { View, Image, Button, Text, StyleSheet } from "react-native";
+import { View, Image, Button, Text, StyleSheet, Alert } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuth } from "../../context/AuthContext";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -8,6 +8,9 @@ export default function Menu() {
   const { userRole, professorMode, setProfessorMode, logout } = useAuth();
   const handleSwitchBetweenProfAndStudentMode = () => {
     setProfessorMode(!professorMode);
+    Alert.alert(
+      `You have switched to ${professorMode ? "student" : "professor"} mode`
+    );
   };
   return (
     <DrawerContentScrollView style={styles.container}>
