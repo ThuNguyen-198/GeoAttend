@@ -12,12 +12,15 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import { useLocation } from "../context/LocationContext";
 import MarkAttendanceModal from "../components/student/MarkAttendanceModal";
+import { useAuth } from "../context/AuthContext";
+import CheckAttendanceModal from "../components/professor/CheckAttendanceModal";
 
-const MarkAttendanceButton = ({ children }) => {
+const AttendanceButton = ({ children }) => {
   const [location, setLocation] = useState("Kent State University");
   const [code, setCode] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
   const { locationIsOn, turnOnLocation, turnOffLocation } = useLocation();
+  const { professorMode } = useAuth();
   const handleLocation = () => {
     locationIsOn ? turnOffLocation() : turnOnLocation();
   };
@@ -36,12 +39,19 @@ const MarkAttendanceButton = ({ children }) => {
       <TouchableOpacity style={styles.container} onPress={toggleModal}>
         <MaterialCommunityIcons name="plus-circle" size={40} color="#fff" />
       </TouchableOpacity>
-
-      <MarkAttendanceModal
-        visible={isModalVisible}
-        onClose={() => setModalVisible(false)}
-        course={{}}
-      />
+      {professorMode ? (
+        <CheckAttendanceModal
+          visible={isModalVisible}
+          onClose={() => setModalVisible(false)}
+          course={{}}
+        />
+      ) : (
+        <MarkAttendanceModal
+          visible={isModalVisible}
+          onClose={() => setModalVisible(false)}
+          course={{}}
+        />
+      )}
     </View>
   );
 };
@@ -138,7 +148,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MarkAttendanceButton;
+export default AttendanceButton;
 
 //Use this block to open a new screen instead of a modal
 // import { View, Text, StyleSheet, TouchableOpacity } from "react-native";

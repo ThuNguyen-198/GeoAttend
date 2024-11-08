@@ -8,23 +8,43 @@ import CourseNavigator from "./CourseNavigator";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import MarkAttendanceButton from "./MarkAttendanceButton";
+import AttendanceButton from "./MarkAttendanceButton";
 import { useLocation } from "../context/LocationContext";
 import MessageNavigator from "./MessageNavigator";
 import GroupNavigator from "./GroupNavigator";
+import { useAuth } from "../context/AuthContext";
 
 export default function TabNavigator() {
   const Tab = createBottomTabNavigator();
   const navigation = useNavigation();
   const { locationIsOn } = useLocation();
+  const { userRole, professorMode, setProfessorMode } = useAuth();
   const handleLocation = () => {
     Alert.alert("handle location here!");
+  };
+  const handleSwitchBetweenProfAndStudentMode = () => {
+    setProfessorMode(!professorMode);
+    Alert.alert(
+      `You have switched to ${professorMode ? "student" : "professor"} mode`
+    );
   };
   const AppHeader = () => {
     return (
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>GeoAttend</Text>
         <View style={styles.pair}>
+          {userRole === "professor" && (
+            <TouchableOpacity
+              style={styles.row}
+              onPress={handleSwitchBetweenProfAndStudentMode}
+            >
+              <MaterialCommunityIcons
+                name="account-switch-outline"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+          )}
           <MaterialCommunityIcons
             name={
               locationIsOn
@@ -86,7 +106,7 @@ export default function TabNavigator() {
         component={HomePage}
         options={{
           tabBarButton: (props) => (
-            <MarkAttendanceButton {...props}></MarkAttendanceButton>
+            <AttendanceButton {...props}></AttendanceButton>
           ),
         }}
       />
