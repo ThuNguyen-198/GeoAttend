@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -7,8 +7,18 @@ import {
   View,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { supabase } from "../../backend/supabase";
+import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "../../context/AuthContext";
 export default function Attendance() {
   const [expandedCourse, setExpandedCourse] = useState(null);
+  const [attendanceList, setAttendanceList] = useState(null);
+  const [fetchError, setFetchError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const previousAttendanceList = useRef(null);
+  const { session } = useAuth();
+  const user = session.user.email;
+  console.log(JSON.stringify(user, null, 2));
   const courses = [
     {
       courseId: 1,
@@ -64,6 +74,47 @@ export default function Attendance() {
     else if (presence.length / attendaceList.length >= 0.75) return "yellow";
     else return "red";
   };
+
+  // const fetchAttendanceList = async () => {
+  //   if (
+  //     !attendanceList ||
+  //     JSON.stringify(previousAttendanceList.current) !==
+  //       JSON.stringify(attendanceList)
+  //   ) {
+  //     setIsLoading(true);
+  //   }
+  //   let { data: attendance, error } = await supabase
+  //     .from("groups")
+  //     .select(
+  //       "name AS group_name, email AS group_email, students:name AS student_name"
+  //     )
+  //     .join("student_courses", "groups.group", "student_courses.studentId")
+  //     .join("students", "student_courses.studentId", "students.id")
+  //     .eq("students.email", user);
+  //   if (error) {
+  //     setFetchError(error);
+  //     setAttendanceList(null);
+  //     console.log("error :", error);
+  //     setIsLoading(false);
+  //   } else if (attendance) {
+  //     if (
+  //       JSON.stringify(previousAttendanceList.current) !==
+  //       JSON.stringify(attendance)
+  //     ) {
+  //       setAttendanceList(attendance);
+  //       previousAttendanceList.current = attendance;
+  //       console.log(attendanceList);
+  //     }
+  //     setFetchError(null);
+  //   }
+  //   setIsLoading(false);
+  // };
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     fetchAttendanceList();
+  //   }, [])
+  // );
 
   return (
     <View style={styles.container}>

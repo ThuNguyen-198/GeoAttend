@@ -19,7 +19,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      console.log(JSON.stringify(session, null, 2));
+
+      // console.log("session in authContext: ", JSON.stringify(session, null, 2));
 
       if (session && session.user && session.user.user_metadata) {
         const role = session.user.user_metadata.role;
@@ -58,53 +59,11 @@ export const AuthProvider = ({ children }) => {
     return data.session;
   };
 
-  // useEffect(() => {
-  //   const checkSession = async () => {
-  //     try {
-  //       setIsLoading(true);
-  //       const {
-  //         data: { session },
-  //       } = await supabase.auth.getSession();
-
-  //       if (session) {
-  //         console.log("Session found:", session);
-  //         setIsAuthenticated(true);
-  //       } else {
-  //         console.log("No session found.");
-  //         setIsAuthenticated(false);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error checking session:", error.message);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   checkSession();
-
-  //   // Add a listener for auth state changes to keep `isAuthenticated` updated
-  //   const { subscription } = supabase.auth.onAuthStateChange(
-  //     (event, session) => {
-  //       if (session) {
-  //         console.log("Auth state changed - user logged in:", session);
-  //         setIsAuthenticated(true);
-  //       } else {
-  //         console.log("Auth state changed - user logged out.");
-  //         setIsAuthenticated(false);
-  //       }
-  //     }
-  //   );
-
-  //   return () => subscription?.unsubscribe?.(); // Safely handle unsubscribing
-  // }, []);
-
-  // const login = () => setIsAuthenticated(true);
-
   const logout = async () => {
     setIsLoadingSignout(true);
     try {
       await supabase.auth.signOut();
-
+      setSession(null);
       setIsAuthenticated(false);
     } catch (error) {
       console.error("Error signing out:", error.message);
@@ -135,39 +94,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // const signInWithGoogle = async () => {
-  //   try {
-  //     const { data, error } = await supabase.auth.signInWithOAuth({
-  //       provider: "google",
-  //       options: {
-  //         queryParams: {
-  //           access_type: "online",
-  //           prompt: "select_account",
-  //           redirectTo: "geoattend://auth/callback",
-  //         },
-  //       },
-  //     });
-
-  //     if (error) {
-  //       console.error("Google sign-in error:", error.message);
-  //       alert("Error signing in with Google");
-  //       return;
-  //     }
-
-  //     if (data?.url) {
-  //       console.log("Google Sign-in URL:", data.url);
-  //       Linking.openURL(data.url); // Open the URL in a browser or in-app
-  //     }
-  //   } catch (error) {
-  //     console.error("Unexpected error during Google sign-in:", error.message);
-  //     alert("An unexpected error occurred during sign-in");
-  //   }
-  // };
-
   return (
     <AuthContext.Provider
       value={{
         session,
+        setSession,
         isAuthenticated,
         userRole,
         professorMode,

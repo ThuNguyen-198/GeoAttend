@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "geoattend",
+    "scheme": "com.geoattend",
     "platforms": ["ios", "android"],
     "splash": {
       "image": "./assets/splash.png",
@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.geoattend"
     },
     "web": {
       "favicon": "./assets/favicon.png"

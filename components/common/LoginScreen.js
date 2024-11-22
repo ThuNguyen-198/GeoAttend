@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -18,12 +18,13 @@ import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { BlurView } from "@react-native-community/blur";
+import Auth from "./Auth";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { session, login, signInWithGoogle } = useAuth();
+  const { session, setSession, login, signInWithGoogle } = useAuth();
 
   const isFormValid = email && password;
   const handleLogin = () => {
@@ -47,65 +48,6 @@ const LoginScreen = ({ navigation }) => {
     Alert.alert("Login with Microsoft", "Microsoft login functionality");
   };
 
-  const handleGoogleLogin = async () => {
-    await performOAuth();
-  };
-  WebBrowser.maybeCompleteAuthSession(); // required for web only
-  const redirectTo = makeRedirectUri();
-
-  const createSessionFromUrl = async (url) => {
-    const { params, errorCode } = QueryParams.getQueryParams(url);
-
-    if (errorCode) throw new Error(errorCode);
-    const { access_token, refresh_token } = params;
-
-    if (!access_token) return;
-
-    const { data, error } = await supabase.auth.setSession({
-      access_token,
-      refresh_token,
-    });
-    if (error) throw error;
-    console.log("session data: ", data);
-    return data.session;
-  };
-
-  const performOAuth = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo,
-        skipBrowserRedirect: true,
-      },
-    });
-    if (error) throw error;
-
-    const res = await WebBrowser.openAuthSessionAsync(
-      data?.url ?? "",
-      redirectTo
-    );
-
-    if (res.type === "success") {
-      const { url } = res;
-      await createSessionFromUrl(url);
-    }
-  };
-
-  // const sendMagicLink = async () => {
-  //   const { error } = await supabase.auth.signInWithOtp({
-  //     email: "example@email.com",
-  //     options: {
-  //       emailRedirectTo: redirectTo,
-  //     },
-  //   });
-
-  //   if (error) throw error;
-  //   // Email sent.
-  // };
-  const url = Linking.useURL();
-  console.log(url);
-  if (url) createSessionFromUrl(url);
-
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
@@ -119,7 +61,8 @@ const LoginScreen = ({ navigation }) => {
 
         <TextInput
           style={styles.input}
-          placeholder="Email@address.com"
+          placeholder="email@address.com"
+          autoCapitalize="none"
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
@@ -156,17 +99,11 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.microsoftButtonText}>Log in with Microsoft</Text>
         </TouchableOpacity>
 
-        {/* Google login button */}
-        <TouchableOpacity
-          style={styles.googleButton}
-          onPress={handleGoogleLogin}
-        >
-          <Text style={styles.googleButtonText}>Log in with Google</Text>
-        </TouchableOpacity>
+        <Auth />
 
-        <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
           <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <View style={styles.signupContainer}>
           <Text>Don't have an account?</Text>
@@ -212,7 +149,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     marginBottom: 16,
-    paddingHorizontal: 10,
+    paddingHorizontal: 18,
     borderRadius: 25,
   },
   button: {

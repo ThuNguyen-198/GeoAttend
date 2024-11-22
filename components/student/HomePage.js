@@ -12,44 +12,47 @@ import { supabase } from "../../backend/supabase";
 import React, { useEffect, useRef, useState } from "react";
 import AddNewCourse from "./AddNewCourse";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "../../context/AuthContext";
+import CreateNewCourse from "../professor/CreateNewCourse";
 
 export default function HomePage({ navigation }) {
   const [fetchError, setFetchError] = useState(null);
   const [courses, setCourses] = useState(null);
   const [isAddCourseModalVisible, setAddCourseModalVisible] = useState(false);
+  const [isCreateCourseModalVisible, setCreateCourseModalVisible] =
+    useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const previousCourses = useRef(null);
+
+  const { session, professorMode } = useAuth();
+  console.log(JSON.stringify(session, null, 2));
 
   const toggleAddCourseModal = () => {
     setAddCourseModalVisible(!isAddCourseModalVisible);
   };
-
-  const fetchCourses = async () => {
-    if (
-      !courses ||
-      JSON.stringify(previousCourses.current) !== JSON.stringify(courses)
-    ) {
-      setIsLoading(true);
-    }
-    let { data: course, error } = await supabase.from("course").select("*");
-    if (error) {
-      setFetchError(error);
-      setCourses(null);
-      console.log("error :", error);
-      setIsLoading(false);
-    } else if (course) {
-      if (JSON.stringify(previousCourses.current) !== JSON.stringify(course)) {
-        setCourses(course);
-        previousCourses.current = course;
+  const toggleCreateCourseModal = () => {
+    setCreateCourseModalVisible(!isCreateCourseModalVisible);
+  };
+  const fetchCourses = async (email, role) => {
+    setIsLoading(true);
+    try {
+      let { data, error } = await supabase.rpc("fetch_user_courses", {
+        email_input: email,
+        role_input: role,
+      });
+      if (error) console.log("error: ", error);
+      else if (data) {
+        setCourses(data);
       }
-      setFetchError(null);
+    } catch (error) {
+      console.error("Unexpected error when fetching courses:", error);
     }
     setIsLoading(false);
   };
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchCourses();
+      fetchCourses(session.user.email, professorMode ? "professor" : "student");
     }, [])
   );
 
@@ -57,7 +60,11 @@ export default function HomePage({ navigation }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Courses</Text>
-        <TouchableOpacity onPress={toggleAddCourseModal}>
+        <TouchableOpacity
+          onPress={
+            professorMode ? toggleCreateCourseModal : toggleAddCourseModal
+          }
+        >
           <MaterialCommunityIcons name="plus" size={38} color="#949494" />
         </TouchableOpacity>
       </View>
@@ -78,13 +85,25 @@ export default function HomePage({ navigation }) {
         />
       )}
 
-      <AddNewCourse
-        isVisible={isAddCourseModalVisible}
-        onClose={() => {
-          setAddCourseModalVisible(false);
-        }}
-        toggleModal={toggleAddCourseModal}
-      />
+      {professorMode ? (
+        <CreateNewCourse
+          isVisible={isCreateCourseModalVisible}
+          onClose={() => {
+            setCreateCourseModalVisible(false);
+          }}
+          toggleModal={toggleCreateCourseModal}
+          fetchCourses={fetchCourses}
+        />
+      ) : (
+        <AddNewCourse
+          isVisible={isAddCourseModalVisible}
+          onClose={() => {
+            setAddCourseModalVisible(false);
+          }}
+          toggleModal={toggleAddCourseModal}
+          fetchCourses={fetchCourses}
+        />
+      )}
     </View>
   );
 }
