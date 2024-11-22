@@ -5,7 +5,8 @@ import { useAuth } from "../../context/AuthContext";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function Menu() {
-  const { userRole, professorMode, setProfessorMode, logout } = useAuth();
+  const { session, userRole, professorMode, setProfessorMode, logout } =
+    useAuth();
   const handleSwitchBetweenProfAndStudentMode = () => {
     setProfessorMode(!professorMode);
     Alert.alert(

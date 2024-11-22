@@ -41,8 +41,10 @@ const RegisterScreen = ({ navigation }) => {
       Alert.alert(error.message);
     } else {
       navigation.navigate("Login");
+      setName("");
       setEmail("");
       setPassword("");
+      setIsProfessor(false);
     }
     if (!session)
       Alert.alert("Please check your inbox for email verification!");

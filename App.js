@@ -6,6 +6,11 @@ import AppNavigator from "./navigation/AppNavigator";
 import { useEffect } from "react";
 import { Linking } from "react-native";
 import { supabase } from "./backend/supabase";
+import { LogBox } from "react-native";
+
+LogBox.ignoreLogs([
+  "Warning: TextElement: Support for defaultProps will be removed",
+]);
 
 export default function App() {
   // useEffect(() => {

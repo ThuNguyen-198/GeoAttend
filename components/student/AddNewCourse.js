@@ -11,11 +11,14 @@ import {
 } from "react-native";
 import Modal from "react-native-modal";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { supabase } from "../../backend/supabase";
+import { useAuth } from "../../context/AuthContext";
 
-const AddNewCourse = ({ isVisible, onClose, toggleModal }) => {
+const AddNewCourse = ({ isVisible, onClose, toggleModal, fetchCourses }) => {
   const [courseInput, setCourseInput] = useState("");
   const [isCourseDisplayed, setDisplayCourse] = useState(false);
   const [courseToAdd, setCourseToAdd] = useState({});
+  const { session, professorMode } = useAuth();
   const courses = [
     {
       id: "1",
@@ -29,22 +32,48 @@ const AddNewCourse = ({ isVisible, onClose, toggleModal }) => {
     },
   ];
 
-  const handleDisplayCourse = () => {
-    const course = courses.find((course) => course.class_id === courseInput);
-    if (course) {
+  const handleDisplayCourse = async () => {
+    if (!courseInput) {
+      Alert.alert("Please input a course ID!");
+      return;
+    }
+
+    let { data, error } = await supabase.rpc("get_course_by_code", {
+      course_code_input: courseInput,
+    });
+
+    if (error) {
+      Alert.alert("Error", error.message);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      const course = data[0]; // Assuming the RPC returns an array of rows
       setCourseToAdd(course);
       setDisplayCourse(true);
+      console.log("display ne: ", course);
     } else {
-      setDisplayCourse(false);
       Alert.alert("Course Not Found", "This course ID doesn't exist.");
+      setDisplayCourse(false);
     }
   };
-  const handleAddCourse = () => {
-    Alert.alert(
-      "Course Added",
-      `${courseToAdd.course_name} has been added to your courses`
-    );
-    onClose();
+
+  const handleAddCourse = async () => {
+    let { data, error } = await supabase.rpc("add_user_to_course", {
+      course_id_input: courseToAdd.course_id,
+      role_name_input: "student",
+      user_id_input: session.user.id,
+    });
+    if (error) console.error(error);
+    else {
+      fetchCourses(session.user.email, professorMode ? "professor" : "student");
+      Alert.alert(
+        "Course Added",
+        `${courseToAdd.course_name} has been added to your courses`
+      );
+
+      onClose();
+    }
   };
 
   return (
