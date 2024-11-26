@@ -14,6 +14,8 @@ import { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import { useLocation } from "../../context/LocationContext";
 import MarkAttendanceModal from "./MarkAttendanceModal";
+import { fetchCourseDetails } from "../../backend/supabase";
+
 
 export default function CourseDetails() {
   const [markAttendanceIsOpen, setMarkAttendanceIsOpen] = useState(false);
@@ -26,9 +28,19 @@ export default function CourseDetails() {
   const [course, setCourse] = useState({});
   const route = useRoute();
   const { item } = route.params;
+  
   useEffect(() => {
-    setCourse(item);
-  }, []);
+    const fetchDetails = async () => {
+        try {
+            const data = await fetchCourseDetails(item.id);
+            setCourse(data);
+        } catch (error) {
+            console.error("Error fetching course details:", error.message);
+        }
+    };
+
+    fetchDetails();
+  }, [item.id]);
 
   const handleLocation = () => {
     locationIsOn ? turnOffLocation() : turnOnLocation();

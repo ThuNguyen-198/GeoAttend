@@ -15,6 +15,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import RNPickerSelect from "react-native-picker-select";
 import { useLocation } from "../../context/LocationContext";
+import { markAttendance } from "../../backend/supabase";
+
 
 const MarkAttendanceModal = ({ visible, onClose, course }) => {
   const [selectedValue, setSelectedValue] = useState(null);
@@ -36,6 +38,22 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
     turnOnLocation,
     turnOffLocation,
   } = useLocation();
+
+  const handleMarkAttendance = async () => {
+    const attendanceData = {
+        student_id: "student_id_here", // Replace with actual ID
+        session_id: "session_id_here", // Replace with actual ID
+        present: true,
+    };
+
+    try {
+        await markAttendance(attendanceData);
+        Alert.alert("Attendance marked successfully!");
+    } catch (error) {
+        console.error("Error marking attendance:", error.message);
+        Alert.alert("Failed to mark attendance.");
+    }
+  };
 
   useEffect(() => {
     if (course) {

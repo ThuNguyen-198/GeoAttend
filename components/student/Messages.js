@@ -10,6 +10,9 @@ import {
   View,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
+import { getMessagesByUser, sendMessage } from "../../backend/supabase";
+
 
 export default function Messages({ navigation }) {
   const friends = [
@@ -40,6 +43,56 @@ export default function Messages({ navigation }) {
       ],
     },
   ];
+
+  const Messages = ({ userId }) => {
+    const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchMessages = async () => {
+            try {
+                const data = await getMessagesByUser(userId);
+                setMessages(data);
+            } catch (error) {
+                console.error("Error fetching messages:", error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMessages();
+    }, [userId]);
+
+    const handleSendMessage = async () => {
+        const messageData = {
+            senderId: userId,
+            recipientId: "recipient_id_here",
+            message: "Hello!",
+        };
+        try {
+            await sendMessage(messageData);
+            alert("Message sent successfully!");
+        } catch (error) {
+            console.error("Error sending message:", error.message);
+        }
+    };
+
+    return (
+        <View>
+            {loading ? (
+                <ActivityIndicator />
+            ) : (
+                <FlatList
+                    data={messages}
+                    renderItem={({ item }) => (
+                        <Text>{`${item.sender_id} to ${item.recipient_id}: ${item.message}`}</Text>
+                    )}
+                />
+            )}
+            <Button title="Send Message" onPress={handleSendMessage} />
+        </View>
+    );
+};
   const getInitials = (userName) => {
     if (!userName) return "";
     const nameArray = userName.split(" ");

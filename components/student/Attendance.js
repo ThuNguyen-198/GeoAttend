@@ -7,6 +7,11 @@ import {
   View,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
+import { getAttendanceByCourse } from "../../backend/supabase";
+
+
+
 export default function Attendance() {
   const [expandedCourse, setExpandedCourse] = useState(null);
   const courses = [
@@ -41,6 +46,41 @@ export default function Attendance() {
       ],
     },
   ];
+
+  const Attendance = ({ courseId }) => {
+    const [attendance, setAttendance] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchAttendance = async () => {
+            try {
+                const data = await getAttendanceByCourse(courseId);
+                setAttendance(data);
+            } catch (error) {
+                console.error("Error fetching attendance:", error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAttendance();
+    }, [courseId]);
+
+    return loading ? (
+        <ActivityIndicator />
+    ) : (
+        <FlatList
+            data={attendance}
+            renderItem={({ item }) => (
+                <View>
+                    <Text>{item.date}</Text>
+                    <Text>{item.present ? "Present" : "Absent"}</Text>
+                </View>
+            )}
+        />
+    );
+  };
+  
   const toggleCourse = (courseId) => {
     setExpandedCourse(expandedCourse === courseId ? null : courseId);
   };

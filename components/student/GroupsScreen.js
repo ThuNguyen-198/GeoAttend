@@ -7,6 +7,9 @@ import {
   View,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
+import { getGroupsByUser, createGroup } from "../../backend/supabase";
+
 
 export default function GroupsScreen({ navigation }) {
   const [expandedGroup, setExpandedGroup] = useState(null);
@@ -42,6 +45,50 @@ export default function GroupsScreen({ navigation }) {
       ],
     },
   ];
+
+  const GroupsScreen = ({ userId }) => {
+    const [groups, setGroups] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const data = await getGroupsByUser(userId);
+                setGroups(data);
+            } catch (error) {
+                console.error("Error fetching groups:", error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchGroups();
+    }, [userId]);
+
+    const handleCreateGroup = async () => {
+        const groupName = "New Group"; // Example name
+        try {
+            await createGroup({ groupName, createdBy: userId });
+            alert("Group created successfully!");
+        } catch (error) {
+            console.error("Error creating group:", error.message);
+        }
+    };
+
+    return (
+        <View>
+            {loading ? (
+                <ActivityIndicator />
+            ) : (
+                <FlatList
+                    data={groups}
+                    renderItem={({ item }) => <Text>{item.groups.group_name}</Text>}
+                />
+            )}
+            <Button title="Create Group" onPress={handleCreateGroup} />
+        </View>
+    );
+};
 
   const toggleGroup = (groupId) => {
     setExpandedGroup(expandedGroup === groupId ? null : groupId);

@@ -18,6 +18,7 @@ import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { BlurView } from "@react-native-community/blur";
+import { loginUser } from "../../backend/supabase";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -52,6 +53,16 @@ const LoginScreen = ({ navigation }) => {
   };
   WebBrowser.maybeCompleteAuthSession(); // required for web only
   const redirectTo = makeRedirectUri();
+
+  // adddition from sashank 
+  // const handleLogin = async () => {
+  //   try {
+  //       const user = await loginUser({ email, password });
+  //       console.log("User logged in:", user);
+  //   } catch (error) {
+  //       Alert.alert("Login failed", error.message);
+  //   }
+  // };
 
   const createSessionFromUrl = async (url) => {
     const { params, errorCode } = QueryParams.getQueryParams(url);
