@@ -25,7 +25,6 @@ export default function HomePage({ navigation }) {
   const previousCourses = useRef(null);
 
   const { session, professorMode } = useAuth();
-  console.log(JSON.stringify(session, null, 2));
 
   const toggleAddCourseModal = () => {
     setAddCourseModalVisible(!isAddCourseModalVisible);

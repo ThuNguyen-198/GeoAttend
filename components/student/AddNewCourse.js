@@ -19,18 +19,18 @@ const AddNewCourse = ({ isVisible, onClose, toggleModal, fetchCourses }) => {
   const [isCourseDisplayed, setDisplayCourse] = useState(false);
   const [courseToAdd, setCourseToAdd] = useState({});
   const { session, professorMode } = useAuth();
-  const courses = [
-    {
-      id: "1",
-      class_id: "100",
-      course_name: "New Course 1",
-    },
-    {
-      id: "2",
-      class_id: "200",
-      course_name: "New Course 2",
-    },
-  ];
+  // const courses = [
+  //   {
+  //     id: "1",
+  //     class_id: "100",
+  //     course_name: "New Course 1",
+  //   },
+  //   {
+  //     id: "2",
+  //     class_id: "200",
+  //     course_name: "New Course 2",
+  //   },
+  // ];
 
   const handleDisplayCourse = async () => {
     if (!courseInput) {
@@ -71,7 +71,9 @@ const AddNewCourse = ({ isVisible, onClose, toggleModal, fetchCourses }) => {
         "Course Added",
         `${courseToAdd.course_name} has been added to your courses`
       );
-
+      setDisplayCourse(false);
+      setCourseInput("");
+      setCourseToAdd({});
       onClose();
     }
   };

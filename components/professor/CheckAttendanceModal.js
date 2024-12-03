@@ -15,32 +15,113 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import RNPickerSelect from "react-native-picker-select";
 import { CheckBox } from "react-native-elements";
+import { supabase } from "../../backend/supabase";
+import { useAuth } from "../../context/AuthContext";
+import getAddressFromCoordinates from "../../utils/getAddressFromCoordinates";
 
 const CheckAttendanceModal = ({ visible, onClose, course }) => {
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [courses, setCourses] = useState([
-    { courseName: "Advanced Database", courseId: "112" },
-    { courseName: "Capstone Project", courseId: "136" },
-    { courseName: "Advanced Algorithm", courseId: "143" },
-    { courseName: "Course A", courseId: "118" },
-    { courseName: "Course B", courseId: "1125" },
-    { courseName: "Course C", courseId: "1243" },
-  ]);
-  const [code, setCode] = useState("");
-  const [isRequireLocation, setIsRequireLocation] = useState(true);
-  const [isRequireCode, setIsRequireCode] = useState(true);
+  const { session } = useAuth();
+  const [selectedCourseIndex, setSelectedCourseIndex] = useState(null);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [code, setCode] = useState();
+  const [isLocationRequired, setIsLocationRequired] = useState(false);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [longitude, setLongtitude] = useState(null);
+  const [latitude, setLatitude] = useState(null);
+  const [address, setAddress] = useState(null);
+  const [isCodeRequired, setIsCodeRequired] = useState(true);
   const [isOnCheckingAttendance, setIsOnCheckingAttendance] = useState(false);
   const [timer, setTimer] = useState(3600); // 1 hour in seconds
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [selectedTimer, setSelectedTimer] = useState("1 hour");
   const [customTime, setCustomTime] = useState("");
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [isOptionDisabled, setIsOptionDisable] = useState(true);
+  const fetchCourses = async (email, role) => {
+    // setIsLoading(true);
+    try {
+      let { data, error } = await supabase.rpc("fetch_user_courses", {
+        email_input: email,
+        role_input: role,
+      });
+      if (error) console.log("error: ", error);
+      else if (data) {
+        setCourses(data);
+
+        //         data:
+        //          {
+        //     "course_id": "dbad5f1b-bb67-452f-80a1-bd1f956a6ff0",
+        //     "course_name": "Night 5",
+        //     "course_code": "c31c8c",
+        //     "longitude": -81.340693,
+        //     "latitude": 41.1438,
+        //     "meeting_dates": [
+        //       "2024-12-03",
+        //       "2024-12-05",
+        //       "2024-12-08",
+        //       "2024-12-10",
+        //       "2024-12-12",
+        //       "2024-12-15"
+        //     ],
+        //     "start_time": "01:01:00",
+        //     "end_time": "02:02:00"
+        //   }
+      }
+    } catch (error) {
+      console.error("Unexpected error when fetching courses:", error);
+    }
+    // setIsLoading(false);
+  };
+  const fetchLocation = async () => {
+    setIsLoadingLocation(true);
+    let { data, error } = await supabase.rpc("get_course_location", {
+      courseid: selectedCourseIndex,
+    });
+    if (error) console.error(error);
+    else {
+      setLongtitude(data[0].longitude);
+      setLatitude(data[0].latitude);
+    }
+    setIsLoadingLocation(false);
+  };
+  const createAttendance = async (
+    course_id_input,
+    start_time_input,
+    end_time_input,
+    iscoderequired_input,
+    islocationrequired_input,
+    attendance_code_input,
+    latitude_input,
+    longitude_input,
+    isOpen
+  ) => {
+    let { data, error } = await supabase.rpc("check_attendance", {
+      p_course_id: course_id_input,
+      p_start_time: start_time_input,
+      p_end_time: end_time_input,
+      p_iscoderequired: iscoderequired_input,
+      p_islocationrequired: islocationrequired_input,
+      p_attendance_code: attendance_code_input,
+      p_latitude: latitude_input,
+      p_longitude: longitude_input,
+      p_isopen: true,
+    });
+    if (error)
+      console.error("error on calling function check_attendance: ", error);
+    else {
+      console.log("You're checking attendance now");
+    }
+  };
+  useEffect(() => {
+    fetchCourses(session.user.email, "professor");
+  }, []);
 
   useEffect(() => {
     if (course) {
-      setSelectedCourse(course.courseId);
+      setSelectedCourseIndex(course.courseId);
     } else {
-      setSelectedCourse(null);
+      setSelectedCourseIndex(null);
     }
   }, [course, visible]);
 
@@ -49,14 +130,6 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
       resetTimer();
     }
   }, [visible]);
-
-  useEffect(() => {
-    if (selectedCourse) {
-      const selectedCourse = courses.find(
-        (item) => item.courseId === selectedCourse
-      );
-    }
-  }, [selectedCourse]);
 
   useEffect(() => {
     let interval = null;
@@ -114,18 +187,94 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
       "0"
     )}:${String(secs).padStart(2, "0")}`;
   };
-
+  //-------------------------------------
   const resetTimer = () => {
     setTimer(3600);
     setIsTimerRunning(false);
     setIsOnCheckingAttendance(false);
   };
-  const handleCheckingAttendance = () => {
-    setIsOnCheckingAttendance(!isOnCheckingAttendance);
-    if (isRequireCode) {
+  //-------------------------------------
+  const handleSelectCourse = (value) => {
+    if (courses[selectedCourseIndex]) {
+      const courseId = courses[selectedCourseIndex].course_id;
+      setSelectedCourseId(courseId);
+    }
+    setIsLocationRequired(false);
+    setAddress(null);
+    setLatitude(null);
+    setLongtitude(null);
+    setIsCodeRequired(true);
+    setSelectedCourseIndex(value);
+    if (value !== null) {
+      setIsOptionDisable(false);
+    } else {
+      setIsOptionDisable(true);
+    }
+  };
+  //-------------------------------------
+
+  //-------------------------------------
+  const handleRequireLocation = async () => {
+    if (isLocationRequired) {
+    } else {
+      if (
+        courses[selectedCourseIndex] &&
+        courses[selectedCourseIndex].longitude
+      ) {
+        console.log("there is a location");
+        setLongtitude(courses[selectedCourseIndex].longitude);
+      }
+      if (
+        courses[selectedCourseIndex] &&
+        courses[selectedCourseIndex].latitude
+      ) {
+        setLatitude(courses[selectedCourseIndex].latitude);
+      }
+    }
+    setIsLocationRequired(!isLocationRequired);
+  };
+  useEffect(() => {
+    if (longitude && latitude) {
+      const add = getAddressFromCoordinates(longitude, latitude);
+      setAddress(add);
+    } else setAddress(null);
+  }, [longitude, latitude]);
+  //-------------------------------------
+  const handleRequireCode = () => {
+    if (isCodeRequired) setIsCodeRequired(!isCodeRequired);
+    else {
       const code = generateRandomCode();
       setCode(code);
+      setIsCodeRequired(!isCodeRequired);
     }
+  };
+  const handleStartCheckingAttendance = () => {
+    const startTime = new Date();
+    const endTime = new Date(startTime);
+    endTime.setHours(startTime.getHours() + timer);
+    createAttendance(
+      selectedCourseId,
+      startTime,
+      endTime,
+      isCodeRequired,
+      isLocationRequired,
+      code,
+      latitude,
+      longitude,
+      true
+    );
+
+    setIsOnCheckingAttendance(!isOnCheckingAttendance);
+    setIsTimerRunning(!isOnCheckingAttendance);
+  };
+  const handleStopCheckingAttendance = async () => {
+    //call rpc function to update column isOpen to false
+
+    let { data, error } = await supabase.rpc("update_checking_attendance", {
+      attendance_status: false,
+    });
+    if (error) console.error(error);
+    setIsOnCheckingAttendance(!isOnCheckingAttendance);
     setIsTimerRunning(!isOnCheckingAttendance);
   };
   const handleEditAttendance = () => {};
@@ -135,11 +284,13 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
   const handleCloseModal = () => {
     onClose();
     resetTimer();
-    setSelectedCourse("");
-    setCode("");
-    setIsRequireCode(true);
-    setIsRequireLocation(true);
+    setSelectedCourseIndex(null);
+    setCode(null);
+    setIsCodeRequired(true);
+    setIsLocationRequired(false);
     setSelectedTimer("1 hour");
+    setIsLoadingLocation(false);
+    setLongtitude(null);
   };
 
   return (
@@ -169,12 +320,12 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
 
             <View style={styles.innerContainer}>
               <RNPickerSelect
-                onValueChange={(value) => value && setSelectedCourse(value)}
-                items={courses.map((course) => ({
-                  label: course.courseName,
-                  value: course.courseId,
+                onValueChange={(value) => handleSelectCourse(value)}
+                items={courses.map((course, index) => ({
+                  label: course.course_name,
+                  value: index,
                 }))}
-                placeholder={{ label: "Select a course...", value: null }}
+                placeholder={{ label: "Select a course here", value: null }}
                 style={{
                   inputIOS: [
                     styles.pickerInput,
@@ -185,7 +336,7 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
                     { opacity: isTimerRunning ? 0.5 : 1 },
                   ],
                 }}
-                value={selectedCourse}
+                value={selectedCourseIndex}
                 textInputProps={{
                   style: [
                     styles.courseName,
@@ -197,44 +348,58 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
               <View style={styles.checkBoxSectionContainer}>
                 <CheckBox
                   title="Require location"
-                  checked={isRequireLocation}
-                  onPress={() => setIsRequireLocation(!isRequireLocation)}
+                  checked={isLocationRequired}
+                  onPress={handleRequireLocation}
                   containerStyle={{
                     backgroundColor: "#fff",
                     borderColor: "#fff",
-                    opacity: isTimerRunning ? 0.5 : 1,
+                    opacity: isTimerRunning || isOptionDisabled ? 0.5 : 1,
+                    paddingLeft: 0,
                   }}
                   textStyle={{
                     color: "#333",
-                    opacity: isTimerRunning ? 0.5 : 1,
+                    opacity: isTimerRunning || isOptionDisabled ? 0.5 : 1,
                   }}
                   uncheckedColor="#424242"
-                  disabled={isTimerRunning}
+                  disabled={isTimerRunning || isOptionDisabled}
                 />
+                {isLocationRequired && !address && (
+                  <Text>
+                    A location has not yet been designated for this course.
+                  </Text>
+                )}
+                {/* {isLocationRequired && !address && (
+                  <Text style={{ paddingHorizontal: 10 }}>
+                    A location has not yet been designated for this course.
+                  </Text>
+                )}
+                {isLocationRequired && address && <Text>{address.name}</Text>} */}
+
                 <CheckBox
                   title="Require code"
-                  checked={isRequireCode}
-                  onPress={() => setIsRequireCode(!isRequireCode)}
+                  checked={isCodeRequired}
+                  onPress={handleRequireCode}
                   containerStyle={{
                     backgroundColor: "#fff",
                     borderColor: "#fff",
-                    opacity: isTimerRunning ? 0.5 : 1,
+                    opacity: isTimerRunning || isOptionDisabled ? 0.5 : 1,
+                    paddingLeft: 0,
                   }}
                   textStyle={{
                     color: "#333",
-                    opacity: isTimerRunning ? 0.5 : 1,
+                    opacity: isTimerRunning || isOptionDisabled ? 0.5 : 1,
                   }}
                   uncheckedColor="#424242"
-                  disabled={isTimerRunning}
+                  disabled={isTimerRunning || isOptionDisabled}
                 />
                 <View style={styles.pair}>
                   <Text
                     style={{
                       color: "#333",
-                      paddingLeft: 20,
+                      paddingLeft: 10,
                       paddingTop: 20,
                       fontWeight: "700",
-                      opacity: isTimerRunning ? 0.5 : 1,
+                      opacity: isTimerRunning || isOptionDisabled ? 0.5 : 1,
                     }}
                   >
                     Set Timer
@@ -254,27 +419,33 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
                     style={{
                       inputIOS: [
                         styles.pickerInput,
-                        { opacity: isTimerRunning ? 0.5 : 1 },
+                        {
+                          opacity: isTimerRunning || isOptionDisabled ? 0.5 : 1,
+                        },
                       ],
                       inputAndroid: [
                         styles.pickerInput,
-                        { opacity: isTimerRunning ? 0.5 : 1 },
+                        {
+                          opacity: isTimerRunning || isOptionDisabled ? 0.5 : 1,
+                        },
                       ],
                     }}
                     value={selectedTimer}
-                    disabled={isTimerRunning}
+                    disabled={isTimerRunning || isOptionDisabled}
                   />
                   {selectedTimer === "other" && (
                     <TextInput
                       style={[
                         styles.input,
-                        { opacity: isTimerRunning ? 0.5 : 1 },
+                        {
+                          opacity: isTimerRunning || isOptionDisabled ? 0.5 : 1,
+                        },
                       ]}
                       keyboardType="numeric"
                       placeholder="Enter time in minutes"
                       value={customTime}
                       onChangeText={setCustomTime}
-                      editable={!isTimerRunning}
+                      editable={!isTimerRunning || !isOptionDisabled}
                     />
                   )}
                 </View>
@@ -283,16 +454,22 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
               {/* Button */}
               <View style={styles.buttonCenter}>
                 <TouchableOpacity
-                  disabled={!selectedCourse}
+                  disabled={selectedCourseIndex === null}
                   style={
-                    selectedCourse ? styles.submitButton : styles.buttonDisabled
+                    selectedCourseIndex !== null
+                      ? styles.submitButton
+                      : styles.buttonDisabled
                   }
-                  onPress={handleCheckingAttendance}
+                  onPress={
+                    isOnCheckingAttendance
+                      ? handleStopCheckingAttendance
+                      : handleStartCheckingAttendance
+                  }
                 >
                   {isOnCheckingAttendance ? (
                     <Text
                       style={
-                        selectedCourse
+                        selectedCourseIndex !== null
                           ? styles.submitButtonText
                           : styles.buttonDisabledText
                       }
@@ -302,7 +479,7 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
                   ) : (
                     <Text
                       style={
-                        selectedCourse
+                        selectedCourseIndex !== null
                           ? styles.submitButtonText
                           : styles.buttonDisabledText
                       }
@@ -339,7 +516,7 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
                     </TouchableOpacity>
                   </View>
                   {/* Display code */}
-                  {isRequireCode && code && (
+                  {isCodeRequired && code && (
                     <View style={styles.displayedCode}>
                       <Text style={styles.displayedCode}>{code}</Text>
                     </View>
@@ -451,7 +628,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   innerContainer: {
-    paddingTop: 16,
+    marginTop: 48,
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "flex-start",
