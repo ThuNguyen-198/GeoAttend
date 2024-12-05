@@ -15,19 +15,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import RNPickerSelect from "react-native-picker-select";
 import { useLocation } from "../../context/LocationContext";
+import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../backend/supabase";
 
 const MarkAttendanceModal = ({ visible, onClose, course }) => {
-  const [selectedValue, setSelectedValue] = useState(null);
-  const [courses, setCourses] = useState([
-    { courseName: "Advanced Database", courseId: "112" },
-    { courseName: "Capstone Project", courseId: "136" },
-    { courseName: "Advanced Algorithm", courseId: "143" },
-    { courseName: "Course A", courseId: "118" },
-    { courseName: "Course B", courseId: "1125" },
-    { courseName: "Course C", courseId: "1243" },
-  ]);
-  // const [location, setLocation] = useState("Kent State University");
-  const [code, setCode] = useState("");
+  const { session } = useAuth();
   const {
     locationIsOn,
     location,
@@ -36,12 +28,83 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
     turnOnLocation,
     turnOffLocation,
   } = useLocation();
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [isLoadingAttendance, setIsLoadingAttendance] = useState(false);
+  const [openAttendance, setOpenAttendance] = useState(null);
+  const [isCodeRequired, setIsCodeRequired] = useState(false);
+  const [isLocationRequired, setIsLocationRequired] = useState(false);
+  const [courseLongitude, setCourseLongitude] = useState(null);
+  const [courseLatitude, setCourseLatitude] = useState(null);
+  const [courseCode, setCourseCode] = useState(null);
+  const [code, setCode] = useState("");
+
+  const fetchCourses = async (email, role) => {
+    // setIsLoading(true);
+    try {
+      let { data, error } = await supabase.rpc("fetch_user_courses", {
+        email_input: email,
+        role_input: role,
+      });
+      if (error) console.log("error: ", error);
+      else if (data) {
+        setCourses(data);
+      }
+    } catch (error) {
+      console.error("Unexpected error when fetching courses:", error);
+    }
+    // setIsLoading(false);
+  };
+  useEffect(() => {
+    fetchCourses(session.user.email, "student");
+  });
+  const fetchAttendanceByCourseId = async (courseId) => {
+    if (!courseId) {
+      console.log("No courseId provided. Exiting fetchAttendanceByCourseId.");
+      return; // Exit early
+    }
+    console.log("Fetching attendance for courseId: ", courseId);
+    try {
+      let { data, error } = await supabase.rpc(
+        "get_open_attendance_by_course_id",
+        {
+          courseid: courseId,
+        }
+      );
+      if (error) {
+        console.error(
+          "Error fetching attendance for courseId: ",
+          courseId,
+          error
+        );
+      } else if (data && data.length > 0) {
+        console.log("Open attendance: ", data[0]);
+        setOpenAttendance(data[0]);
+        setIsCodeRequired(data[0].isCodeRequired);
+        setIsLocationRequired(data[0].isLocationRequired);
+        setCourseCode(data[0].attendance_code);
+        setCourseLongitude(data[0].longitude);
+        setCourseLatitude(data[0].latitude);
+        // console.log("code: ", data[0].attendance_code);
+        // console.log("location: ", data[0].longitude);
+      } else {
+        setOpenAttendance(null);
+        setIsCodeRequired(false);
+        setIsLocationRequired(false);
+        setCourseCode(null);
+        setCourseLongitude(null);
+        setCourseLatitude(null);
+      }
+    } catch (err) {
+      console.error("Unexpected error fetching attendance: ", err);
+    }
+  };
 
   useEffect(() => {
     if (course) {
-      setSelectedValue(course.courseId);
+      setSelectedCourse(course.courseId);
     } else {
-      setSelectedValue(null);
+      setSelectedCourse(null);
     }
   }, [course, visible]);
   useEffect(() => {
@@ -49,20 +112,34 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
       setCode("");
     }
   }, [visible]);
-  useEffect(() => {
-    if (selectedValue) {
-      const selectedCourse = courses.find(
-        (item) => item.courseId === selectedValue
-      );
-      console.log("Selected course:", selectedCourse?.courseName);
+  // useEffect(() => {
+  //   if (selectedCourse) {
+  //     const selectedCourse = courses.find(
+  //       (item) => item.courseId === selectedCourse
+  //     );
+  //   }
+  // }, [selectedCourse]);
+  const handleSelectCourse = (value) => {
+    setSelectedCourse(value);
+    if (!value) {
+      console.log("course null, selected course: ", selectedCourse);
+      setOpenAttendance(null);
+      setIsCodeRequired(false);
+      setIsLocationRequired(false);
+      return;
     }
-  }, [selectedValue]);
-
+    if (value && value !== null) {
+      setIsLoadingAttendance(true);
+      fetchAttendanceByCourseId(value);
+      setIsLoadingAttendance(false);
+    }
+  };
   const handleLocation = () => {
     locationIsOn ? turnOffLocation() : turnOnLocation();
   };
 
   const onSubmitAttendance = () => {
+    console.log("input code: ", code);
     setCode("");
     Alert.alert("Attendance submitted!");
     onClose();
@@ -94,100 +171,114 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
 
           <View style={styles.innerContainer}>
             <RNPickerSelect
-              onValueChange={(value) => value && setSelectedValue(value)}
+              onValueChange={(value) => handleSelectCourse(value)}
               items={courses.map((course) => ({
-                label: course.courseName,
-                value: course.courseId,
+                label: course.course_name,
+                value: course.course_id,
               }))}
               placeholder={{ label: "Select a course...", value: null }}
               style={{
                 inputIOS: styles.pickerInput,
                 inputAndroid: styles.pickerInput,
               }}
-              value={selectedValue}
+              value={selectedCourse}
               textInputProps={{
                 style: styles.courseName,
               }}
             />
-            <View style={styles.card}>
-              <View style={[styles.row, { width: "100%" }]}>
-                <View style={styles.row}>
-                  <MaterialCommunityIcons
-                    name={
-                      locationIsOn
-                        ? "map-marker-check-outline"
-                        : "map-marker-off-outline"
-                    }
-                    style={styles.itemIcon}
-                  />
-                  <Text style={styles.text}>
-                    {locationIsOn ? (
-                      location ? (
-                        <View>
-                          <Text
-                            style={{
-                              fontSize: 18,
-                              fontWeight: "bold",
-                              color: "#333",
-                            }}
-                          >
-                            {locationName}
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 12,
-                              color: "#333",
-                            }}
-                          >
-                            {locationCity}
-                          </Text>
-                        </View>
-                      ) : (
-                        <View style={styles.loadingContainer}>
-                          <Text>Getting your location... </Text>
-                          <ActivityIndicator size="small" color="#013976" />
-                        </View>
-                      )
-                    ) : (
-                      <Text>Please turn on your location</Text>
-                    )}
-                  </Text>
-                </View>
-                <Switch value={locationIsOn} onValueChange={handleLocation} />
-              </View>
 
-              {/* Code Input */}
-              <TextInput
-                style={styles.input}
-                placeholder="Enter the code..."
-                keyboardType="default"
-                value={code}
-                onChangeText={setCode}
-              />
-            </View>
-
-            {/* Submit Button */}
-            <View style={styles.buttonCenter}>
-              <TouchableOpacity
-                disabled={!locationIsOn || !code || !selectedValue}
-                style={
-                  locationIsOn && code && selectedValue
-                    ? styles.submitButton
-                    : styles.buttonDisabled
-                }
-                onPress={onSubmitAttendance}
-              >
-                <Text
-                  style={
-                    locationIsOn && code && selectedValue
-                      ? styles.submitButtonText
-                      : styles.buttonDisabledText
-                  }
-                >
-                  Submit
+            {openAttendance === null ? (
+              !selectedCourse ? (
+                <Text>Please select a course</Text>
+              ) : (
+                <Text>
+                  This course is currently not open for checking attendance
                 </Text>
-              </TouchableOpacity>
-            </View>
+              )
+            ) : (
+              <View>
+                <View style={styles.card}>
+                  <View style={[styles.row, { width: "100%" }]}>
+                    <View style={styles.row}>
+                      <MaterialCommunityIcons
+                        name={
+                          locationIsOn
+                            ? "map-marker-check-outline"
+                            : "map-marker-off-outline"
+                        }
+                        style={styles.itemIcon}
+                      />
+                      <Text style={styles.text}>
+                        {locationIsOn ? (
+                          location ? (
+                            <View>
+                              <Text
+                                style={{
+                                  fontSize: 18,
+                                  fontWeight: "bold",
+                                  color: "#333",
+                                }}
+                              >
+                                {locationName}
+                              </Text>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                  color: "#333",
+                                }}
+                              >
+                                {locationCity}
+                              </Text>
+                            </View>
+                          ) : (
+                            <View style={styles.loadingContainer}>
+                              <Text>Getting your location... </Text>
+                              <ActivityIndicator size="small" color="#013976" />
+                            </View>
+                          )
+                        ) : (
+                          <Text>Please turn on your location</Text>
+                        )}
+                      </Text>
+                    </View>
+                    <Switch
+                      value={locationIsOn}
+                      onValueChange={handleLocation}
+                    />
+                  </View>
+
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter the code..."
+                    keyboardType="default"
+                    value={code}
+                    onChangeText={setCode}
+                  />
+                </View>
+
+                <View style={styles.buttonCenter}>
+                  <TouchableOpacity
+                    disabled={!locationIsOn || !code || !selectedCourse}
+                    style={
+                      locationIsOn && code && selectedCourse
+                        ? styles.submitButton
+                        : styles.buttonDisabled
+                    }
+                    onPress={onSubmitAttendance}
+                  >
+                    <Text
+                      style={
+                        locationIsOn && code && selectedCourse
+                          ? styles.submitButtonText
+                          : styles.buttonDisabledText
+                      }
+                    >
+                      Submit
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
           </View>
         </View>
       </Modal>

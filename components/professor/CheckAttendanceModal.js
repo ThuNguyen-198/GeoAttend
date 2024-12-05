@@ -30,7 +30,7 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
   const [longitude, setLongtitude] = useState(null);
   const [latitude, setLatitude] = useState(null);
   const [address, setAddress] = useState(null);
-  const [isCodeRequired, setIsCodeRequired] = useState(true);
+  const [isCodeRequired, setIsCodeRequired] = useState(false);
   const [isOnCheckingAttendance, setIsOnCheckingAttendance] = useState(false);
   const [timer, setTimer] = useState(3600); // 1 hour in seconds
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -48,43 +48,24 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
       if (error) console.log("error: ", error);
       else if (data) {
         setCourses(data);
-
-        //         data:
-        //          {
-        //     "course_id": "dbad5f1b-bb67-452f-80a1-bd1f956a6ff0",
-        //     "course_name": "Night 5",
-        //     "course_code": "c31c8c",
-        //     "longitude": -81.340693,
-        //     "latitude": 41.1438,
-        //     "meeting_dates": [
-        //       "2024-12-03",
-        //       "2024-12-05",
-        //       "2024-12-08",
-        //       "2024-12-10",
-        //       "2024-12-12",
-        //       "2024-12-15"
-        //     ],
-        //     "start_time": "01:01:00",
-        //     "end_time": "02:02:00"
-        //   }
       }
     } catch (error) {
       console.error("Unexpected error when fetching courses:", error);
     }
     // setIsLoading(false);
   };
-  const fetchLocation = async () => {
-    setIsLoadingLocation(true);
-    let { data, error } = await supabase.rpc("get_course_location", {
-      courseid: selectedCourseIndex,
-    });
-    if (error) console.error(error);
-    else {
-      setLongtitude(data[0].longitude);
-      setLatitude(data[0].latitude);
-    }
-    setIsLoadingLocation(false);
-  };
+  // const fetchLocation = async () => {
+  //   setIsLoadingLocation(true);
+  //   let { data, error } = await supabase.rpc("get_course_location", {
+  //     courseid: selectedCourseIndex,
+  //   });
+  //   if (error) console.error(error);
+  //   else {
+  //     setLongtitude(data[0].longitude);
+  //     setLatitude(data[0].latitude);
+  //   }
+  //   setIsLoadingLocation(false);
+  // };
   const createAttendance = async (
     course_id_input,
     start_time_input,
@@ -115,7 +96,7 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
   };
   useEffect(() => {
     fetchCourses(session.user.email, "professor");
-  }, []);
+  });
 
   useEffect(() => {
     if (course) {
@@ -170,6 +151,20 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
     }
     setTimer(timerValue);
   }, [selectedTimer, customTime]);
+  useEffect(() => {
+    let interval = null;
+    if (isTimerRunning && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else if (isTimerRunning && timer === 0) {
+      handleStopCheckingAttendance(); // Call the function when timer reaches 0
+      setIsTimerRunning(false); // Stop the timer
+    } else if (!isTimerRunning && timer !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, timer]);
 
   const generateRandomCode = () => {
     let code = "";
@@ -276,6 +271,16 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
     if (error) console.error(error);
     setIsOnCheckingAttendance(!isOnCheckingAttendance);
     setIsTimerRunning(!isOnCheckingAttendance);
+    //reset states
+    resetTimer();
+    setSelectedCourseIndex(null);
+    setCode(null);
+    setIsCodeRequired(false);
+    setIsLocationRequired(false);
+    setSelectedTimer("1 hour");
+    setIsLoadingLocation(false);
+    setLongtitude(null);
+    setSelectedCourseId(null);
   };
   const handleEditAttendance = () => {};
   const handleDeleteAttendance = () => {
@@ -283,14 +288,6 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
   };
   const handleCloseModal = () => {
     onClose();
-    resetTimer();
-    setSelectedCourseIndex(null);
-    setCode(null);
-    setIsCodeRequired(true);
-    setIsLocationRequired(false);
-    setSelectedTimer("1 hour");
-    setIsLoadingLocation(false);
-    setLongtitude(null);
   };
 
   return (
@@ -454,7 +451,7 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
               {/* Button */}
               <View style={styles.buttonCenter}>
                 <TouchableOpacity
-                  disabled={selectedCourseIndex === null}
+                  disabled={selectedCourseIndex === null || isOptionDisabled}
                   style={
                     selectedCourseIndex !== null
                       ? styles.submitButton
