@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    minHeight: 800,
+    minHeight: 750,
   },
   row: {
     width: "100%",
