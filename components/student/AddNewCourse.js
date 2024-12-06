@@ -104,12 +104,13 @@ const AddNewCourse = ({ isVisible, onClose, toggleModal, fetchCourses }) => {
 
           <View style={styles.contentContainer}>
             <View style={styles.card}>
-              <Text>Enter Course ID:</Text>
+              <Text style={{ fontSize: 16 }}>Enter Course ID:</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Course ID..."
                 value={courseInput}
                 onChangeText={setCourseInput}
+                autoCapitalize="none"
               />
 
               <TouchableOpacity
@@ -118,18 +119,21 @@ const AddNewCourse = ({ isVisible, onClose, toggleModal, fetchCourses }) => {
               >
                 <Text style={styles.buttonText}>Search</Text>
               </TouchableOpacity>
+
+              {isCourseDisplayed && (
+                <View style={[styles.card, { marginTop: 30 }]}>
+                  <Text style={styles.courseName}>
+                    {courseToAdd.course_name}
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={handleAddCourse}
+                  >
+                    <Text style={styles.buttonText}>Add</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
-            {isCourseDisplayed && (
-              <View style={[styles.card]}>
-                <Text style={styles.courseName}>{courseToAdd.course_name}</Text>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={handleAddCourse}
-                >
-                  <Text style={styles.buttonText}>Add</Text>
-                </TouchableOpacity>
-              </View>
-            )}
           </View>
         </View>
       </Modal>
@@ -196,8 +200,8 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#013976",
     paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 25,
+    paddingHorizontal: 26,
+    borderRadius: 16,
     alignItems: "center",
   },
   buttonText: {

@@ -340,7 +340,10 @@ const CreateNewCourse = ({ isVisible, onClose, toggleModal, fetchCourses }) => {
                   <View style={styles.dateList}>
                     <Text>Day(s):</Text>
                     {weekDate.map((date, index) => (
-                      <TouchableOpacity onPress={() => handleSelectDays(index)}>
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => handleSelectDays(index)}
+                      >
                         <Text
                           style={
                             selectedDays[index]

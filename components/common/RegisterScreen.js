@@ -16,13 +16,15 @@ import { supabase } from "../../backend/supabase";
 import { CheckBox } from "react-native-elements";
 
 const RegisterScreen = ({ navigation }) => {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmedPassword, setConfirmedPassword] = useState("");
   const [isProfessor, setIsProfessor] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const isFormValid = name && email && password;
+  const isFormValid = lastName && email && password;
 
   async function signUpWithEmail() {
     setLoading(true);
@@ -34,14 +36,14 @@ const RegisterScreen = ({ navigation }) => {
       email: email,
       password: password,
       options: {
-        data: { full_name: name, role: role },
+        data: { first_name: firstName, last_name: lastName, role: role },
       },
     });
     if (error) {
-      Alert.alert(error.message);
+      Alert.alert("sign up user error: ", error.message);
     } else {
       navigation.navigate("Login");
-      setName("");
+      setLastName("");
       setEmail("");
       setPassword("");
       setIsProfessor(false);
@@ -50,54 +52,6 @@ const RegisterScreen = ({ navigation }) => {
       Alert.alert("Please check your inbox for email verification!");
     setLoading(false);
   }
-
-  // const handleRegister = async () => {
-  //   if (!isFormValid) {
-  //     Alert.alert("Error", "Please fill out all fields");
-  //     return;
-  //   }
-
-  //   try {
-  //     // Query Supabase to check if the email already exists
-  //     const { data: users, error } = await supabase
-  //       .from("auth.users") // Use the auth.users table to query for existing users
-  //       .select("email")
-  //       .eq("email", email);
-
-  //     if (error) throw error;
-
-  //     if (users.length > 0) {
-  //       // Email already exists
-  //       Alert.alert(
-  //         "Error",
-  //         "This email is already registered. Please use another one."
-  //       );
-  //       return;
-  //     }
-
-  //     // Proceed with registration if email doesn't exist
-  //     const { data, error: signUpError } = await supabase.auth.signUp({
-  //       email: email,
-  //       password: password,
-  //       options: {
-  //         data: { full_name: name },
-  //       },
-  //     });
-
-  //     if (signUpError) {
-  //       Alert.alert("Registration Error", signUpError.message);
-  //     } else if (data.user) {
-  //       Alert.alert("Registration Successful", `Welcome, ${name}`);
-  //       navigation.navigate("Login");
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     Alert.alert(
-  //       "Error",
-  //       "There was an issue checking your email. Please try again."
-  //     );
-  //   }
-  // };
 
   return (
     <KeyboardAvoidingView
@@ -111,9 +65,15 @@ const RegisterScreen = ({ navigation }) => {
 
           <TextInput
             style={styles.input}
-            placeholder="Name"
-            value={name}
-            onChangeText={setName}
+            placeholder="First Name"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Last Name"
+            value={lastName}
+            onChangeText={setLastName}
           />
 
           <TextInput
@@ -122,14 +82,22 @@ const RegisterScreen = ({ navigation }) => {
             keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
+            autoCapitalize="none"
           />
 
           <TextInput
             style={styles.input}
             placeholder="Password"
-            secureTextEntry
             value={password}
             onChangeText={setPassword}
+            secureTextEntry={true}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            value={confirmedPassword}
+            onChangeText={setConfirmedPassword}
+            secureTextEntry={true}
           />
 
           <CheckBox

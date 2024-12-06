@@ -20,6 +20,7 @@ import { supabase } from "../../backend/supabase";
 
 const MarkAttendanceModal = ({ visible, onClose, course }) => {
   const { session } = useAuth();
+  // console.log("session: ", JSON.stringify(session, null, 2));
   const {
     locationIsOn,
     location,
@@ -38,6 +39,8 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
   const [courseLatitude, setCourseLatitude] = useState(null);
   const [courseCode, setCourseCode] = useState(null);
   const [code, setCode] = useState("");
+  const [isLoadingMarkingAttendance, setIsLoadingMarkingAttendance] =
+    useState(false);
 
   const fetchCourses = async (email, role) => {
     // setIsLoading(true);
@@ -58,6 +61,7 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
   useEffect(() => {
     fetchCourses(session.user.email, "student");
   });
+
   const fetchAttendanceByCourseId = async (courseId) => {
     if (!courseId) {
       console.log("No courseId provided. Exiting fetchAttendanceByCourseId.");
@@ -100,13 +104,18 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
     }
   };
 
+  // useEffect(() => {
+  //   if (course) {
+  //     setSelectedCourse(course.courseId);
+  //   } else {
+  //     setSelectedCourse(null);
+  //   }
+  // }, [course, visible]);
   useEffect(() => {
     if (course) {
       setSelectedCourse(course.courseId);
-    } else {
-      setSelectedCourse(null);
     }
-  }, [course, visible]);
+  }, [course]);
   useEffect(() => {
     if (!visible) {
       setCode("");
@@ -138,11 +147,31 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
     locationIsOn ? turnOffLocation() : turnOnLocation();
   };
 
-  const onSubmitAttendance = () => {
+  const handleSubmitAttendance = async () => {
+    // setIsLoadingMarkingAttendance(true);
+
+    let { data, error } = await supabase.rpc("validate_and_mark_attendance", {
+      attendance_id_input: openAttendance.id,
+      code_input: code,
+      latitude_input: location.latitude,
+      longitude_input: location.longitude,
+      user_email_input: session.user.email,
+    });
+    if (error) console.error(error);
+    else {
+      Alert.alert(data);
+    }
+
     console.log("input code: ", code);
     setCode("");
-    Alert.alert("Attendance submitted!");
     onClose();
+    setIsLoadingMarkingAttendance(false);
+    setOpenAttendance(null);
+    setIsCodeRequired(false);
+    setIsLocationRequired(false);
+    setCourseCode(null);
+    setCourseLongitude(null);
+    setCourseLatitude(null);
   };
 
   return (
@@ -189,7 +218,11 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
 
             {openAttendance === null ? (
               !selectedCourse ? (
-                <Text>Please select a course</Text>
+                <Text
+                  style={{ fontSize: 18, textAlign: "center", marginTop: 20 }}
+                >
+                  Please select a course to start checking your attendance.
+                </Text>
               ) : (
                 <Text>
                   This course is currently not open for checking attendance
@@ -258,20 +291,22 @@ const MarkAttendanceModal = ({ visible, onClose, course }) => {
 
                 <View style={styles.buttonCenter}>
                   <TouchableOpacity
-                    disabled={!locationIsOn || !code || !selectedCourse}
-                    style={
-                      locationIsOn && code && selectedCourse
-                        ? styles.submitButton
-                        : styles.buttonDisabled
-                    }
-                    onPress={onSubmitAttendance}
+                    // disabled={!locationIsOn || !code || !selectedCourse}
+                    // style={
+                    //   locationIsOn && code && selectedCourse
+                    //     ? styles.submitButton
+                    //     : styles.buttonDisabled
+                    // }
+                    style={styles.submitButton}
+                    onPress={handleSubmitAttendance}
                   >
                     <Text
-                      style={
-                        locationIsOn && code && selectedCourse
-                          ? styles.submitButtonText
-                          : styles.buttonDisabledText
-                      }
+                      style={styles.submitButtonText}
+                      // style={
+                      //   locationIsOn && code && selectedCourse
+                      //     ? styles.submitButtonText
+                      //     : styles.buttonDisabledText
+                      // }
                     >
                       Submit
                     </Text>

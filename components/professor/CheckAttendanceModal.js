@@ -198,7 +198,7 @@ const CheckAttendanceModal = ({ visible, onClose, course }) => {
     setAddress(null);
     setLatitude(null);
     setLongtitude(null);
-    setIsCodeRequired(true);
+    // setIsCodeRequired(true);
     setSelectedCourseIndex(value);
     if (value !== null) {
       setIsOptionDisable(false);
