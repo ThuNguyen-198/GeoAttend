@@ -54,81 +54,81 @@ const RegisterScreen = ({ navigation }) => {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={100}
-    >
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.container}>
-          <Text style={styles.title}>GeoAttend</Text>
+    // <KeyboardAvoidingView
+    //   style={{ flex: 1 }}
+    //   behavior={Platform.OS === "ios" ? "padding" : "height"}
+    //   keyboardVerticalOffset={100}
+    // >
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={styles.container}>
+        <Text style={styles.title}>GeoAttend</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="First Name"
-            value={firstName}
-            onChangeText={setFirstName}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Last Name"
-            value={lastName}
-            onChangeText={setLastName}
-          />
+        <TextInput
+          style={styles.input}
+          placeholder="First Name"
+          value={firstName}
+          onChangeText={setFirstName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Last Name"
+          value={lastName}
+          onChangeText={setLastName}
+        />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-          />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+        />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={true}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            value={confirmedPassword}
-            onChangeText={setConfirmedPassword}
-            secureTextEntry={true}
-          />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={true}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          value={confirmedPassword}
+          onChangeText={setConfirmedPassword}
+          secureTextEntry={true}
+        />
 
-          <CheckBox
-            title="I am a professor"
-            checked={isProfessor}
-            onPress={() => setIsProfessor(!isProfessor)}
-            containerStyle={{ backgroundColor: "#fff", borderColor: "#fff" }}
-          />
+        <CheckBox
+          title="I am a professor"
+          checked={isProfessor}
+          onPress={() => setIsProfessor(!isProfessor)}
+          containerStyle={{ backgroundColor: "#fff", borderColor: "#fff" }}
+        />
 
-          <TouchableOpacity
-            style={[styles.button, isFormValid ? null : styles.buttonDisabled]}
-            onPress={signUpWithEmail}
-            disabled={!isFormValid || loading}
+        <TouchableOpacity
+          style={[styles.button, isFormValid ? null : styles.buttonDisabled]}
+          onPress={signUpWithEmail}
+          disabled={!isFormValid || loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Registering..." : "Register"}
+          </Text>
+        </TouchableOpacity>
+
+        <View style={styles.loginContainer}>
+          <Text>Already have an account?</Text>
+          <Text
+            style={styles.loginText}
+            onPress={() => navigation.navigate("Login")}
           >
-            <Text style={styles.buttonText}>
-              {loading ? "Registering..." : "Register"}
-            </Text>
-          </TouchableOpacity>
-
-          <View style={styles.loginContainer}>
-            <Text>Already have an account?</Text>
-            <Text
-              style={styles.loginText}
-              onPress={() => navigation.navigate("Login")}
-            >
-              Log in
-            </Text>
-          </View>
+            Log in
+          </Text>
         </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </View>
+    </TouchableWithoutFeedback>
+    // </KeyboardAvoidingView>
   );
 };
 
