@@ -17,8 +17,25 @@ export default function Attendance() {
   const [isLoading, setIsLoading] = useState(false);
   const previousAttendanceList = useRef(null);
   const { session } = useAuth();
-  const user = session.user.email;
-  console.log(JSON.stringify(user, null, 2));
+
+  const fetchCourses = async (email, role) => {
+    setIsLoading(true);
+    try {
+      let { data, error } = await supabase.rpc("fetch_user_courses", {
+        email_input: email,
+        role_input: role,
+      });
+      if (error) console.log("error: ", error);
+      else if (data) {
+        setCourses(data);
+      }
+    } catch (error) {
+      console.error("Unexpected error when fetching courses:", error);
+    }
+    setIsLoading(false);
+  };
+  // const user = session.user.email;
+  // console.log(JSON.stringify(user, null, 2));
   const courses = [
     {
       courseId: 1,

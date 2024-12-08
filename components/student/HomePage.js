@@ -16,6 +16,7 @@ import { useAuth } from "../../context/AuthContext";
 import CreateNewCourse from "../professor/CreateNewCourse";
 
 export default function HomePage({ navigation }) {
+  const { session, professorMode } = useAuth();
   const [fetchError, setFetchError] = useState(null);
   const [courses, setCourses] = useState(null);
   const [isAddCourseModalVisible, setAddCourseModalVisible] = useState(false);
@@ -23,8 +24,9 @@ export default function HomePage({ navigation }) {
     useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const previousCourses = useRef(null);
-
-  const { session, professorMode } = useAuth();
+  useEffect(() => {
+    console.log("session: ", JSON.stringify(session, null, 2));
+  }, [session]);
 
   const toggleAddCourseModal = () => {
     setAddCourseModalVisible(!isAddCourseModalVisible);
